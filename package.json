@@ -1,0 +1,62 @@
+{
+  "name": "react-autocomplete-hint",
+  "version": "1.0.0",
+  "description": "A React component for Autocomplete hint",
+  "main": "src/index.js",
+  "scripts": {
+    "start:dev": "webpack-dev-server --open",
+    "build": "webpack",
+    "start": "npm run build && npm run start:dev",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ejmudi/react-autocomplete-hint.git"
+  },
+  "author": "Ejenavi Mudiaga",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ejmudi/react-autocomplete-hint/issues"
+  },
+  "homepage": "https://github.com/ejmudi/react-autocomplete-hint#readme",
+  "devDependencies": {
+    "@types/react": "^16.9.43",
+    "@types/react-dom": "^16.9.8",
+    "css-loader": "^3.6.0",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "sass-loader": "^9.0.2",
+    "style-loader": "^1.2.1",
+    "ts-loader": "^8.0.1",
+    "typescript": "^3.9.7",
+    "webpack": "^4.44.0",
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-server": "^3.11.0"
+  },
+  "keywords": [
+    "autocomplete",
+    "typeahead",
+    "lookahead",
+    "auto complete",
+    "auto suggest",
+    "auto-complete",
+    "auto-suggest",
+    "autocomplete",
+    "autosuggest",
+    "react",
+    "react autocomplete",
+    "react autosuggest",
+    "react typeahead",
+    "react-typeahead",
+    "react-autocomplete",
+    "react-autosuggest",
+    "react hint",
+    "react-hint",
+    "input hint",
+    "react input hint",
+    "react-input-hint",
+    "react-input-typeahead",
+    "react-typeahead",
+    "react-lookahead"
+  ]
+}
