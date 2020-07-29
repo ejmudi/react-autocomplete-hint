@@ -4,7 +4,7 @@ module.exports = {
     mode: "development",
     entry: {
         app: [
-            './src/index.tsx'
+            './demo/index.tsx'
         ]
     },
     devServer: {
