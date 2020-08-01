@@ -17,8 +17,11 @@
 .env.development.local
 .env.test.local
 .env.production.local
+/dist
 /demo/**
 !demo/index.html
+!demo/index.scss
+!demo/index.tsx
 
 npm-debug.log*
 yarn-debug.log*

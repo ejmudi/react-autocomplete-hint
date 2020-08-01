@@ -1,6 +1,10 @@
 {
   "compilerOptions": {
+    "target": "es5",
     "esModuleInterop": true,
-    "jsx": "react"
+    "jsx": "react",
+    "declaration": true,
+    "outDir": "dist",
+    "strict": true
   }
 }

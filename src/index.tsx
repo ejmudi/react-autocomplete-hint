@@ -30,16 +30,19 @@ export const Hint: React.FC<IHintProps> = props => {
             return;
         }
 
-        const inputStyle = window.getComputedStyle(mainInputRef.current);
+        const inputStyle = mainInputRef.current && window.getComputedStyle(mainInputRef.current);
 
-        hintRef.current.style.fontSize = inputStyle.fontSize;
-        hintRef.current.style.height = inputStyle.height;
-        hintRef.current.style.lineHeight = inputStyle.lineHeight;
-        hintRef.current.style.boxSizing = inputStyle.boxSizing;
-        hintRef.current.style.margin = interpolateStyle(inputStyle, 'margin');
-        hintRef.current.style.padding = interpolateStyle(inputStyle, 'padding');
-        hintRef.current.style.borderStyle = interpolateStyle(inputStyle, 'border', 'style');
-        hintRef.current.style.borderWidth = interpolateStyle(inputStyle, 'border', 'width');
+        if (inputStyle && hintRef?.current?.style) {
+            hintRef.current.style.fontSize = inputStyle.fontSize;
+            hintRef.current.style.width = inputStyle.width;
+            hintRef.current.style.height = inputStyle.height;
+            hintRef.current.style.lineHeight = inputStyle.lineHeight;
+            hintRef.current.style.boxSizing = inputStyle.boxSizing;
+            hintRef.current.style.margin = interpolateStyle(inputStyle, 'margin');
+            hintRef.current.style.padding = interpolateStyle(inputStyle, 'padding');
+            hintRef.current.style.borderStyle = interpolateStyle(inputStyle, 'border', 'style');
+            hintRef.current.style.borderWidth = interpolateStyle(inputStyle, 'border', 'width');
+        }
     });
 
     const getHint = (text: string) => {
@@ -96,7 +99,10 @@ export const Hint: React.FC<IHintProps> = props => {
     return (
         <div
             className="rah-input-wrapper"
-            style={{ position: 'relative' }}>
+            style={{
+                position: 'relative',
+                display: 'inline-block'
+            }}>
             {
                 disableHint
                     ? child
@@ -115,8 +121,7 @@ export const Hint: React.FC<IHintProps> = props => {
                                     pointerEvents: 'none',
                                     position: 'absolute',
                                     top: 0,
-                                    left: 0,
-                                    width: '100%'
+                                    left: 0
                                 }}
                                 tabIndex={-1}
                             />
