@@ -31,8 +31,24 @@ export const Hint: React.FC<IHintProps> = props => {
         }
 
         const inputStyle = mainInputRef.current && window.getComputedStyle(mainInputRef.current);
+        inputStyle && styleHint(hintRef, inputStyle);
+    });
 
-        if (inputStyle && hintRef?.current?.style) {
+    const getHint = (text: string) => {
+        if (!text || text === '') {
+            return '';
+        }
+
+        const match = options
+            .filter(x => x.toLowerCase() !== text.toLowerCase() && x.toLowerCase().startsWith(text.toLowerCase()))
+            .sort()[0];
+        return match || '';
+    };
+
+    const styleHint = (
+        hintRef: React.RefObject<HTMLInputElement>,
+        inputStyle: CSSStyleDeclaration) => {
+        if (hintRef?.current?.style) {
             hintRef.current.style.fontSize = inputStyle.fontSize;
             hintRef.current.style.width = inputStyle.width;
             hintRef.current.style.height = inputStyle.height;
@@ -43,15 +59,6 @@ export const Hint: React.FC<IHintProps> = props => {
             hintRef.current.style.borderStyle = interpolateStyle(inputStyle, 'border', 'style');
             hintRef.current.style.borderWidth = interpolateStyle(inputStyle, 'border', 'width');
         }
-    });
-
-    const getHint = (text: string) => {
-        if (!text || text === '') {
-            return '';
-        }
-
-        const match = options.filter(x => x !== text && x.startsWith(text)).sort()[0];
-        return match || '';
     };
 
     const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {

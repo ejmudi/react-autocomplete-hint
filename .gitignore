@@ -18,10 +18,11 @@
 .env.test.local
 .env.production.local
 /dist
-/demo/**
-!demo/index.html
-!demo/index.scss
-!demo/index.tsx
+/docs/**
+!docs/app.bundle.js
+!docs/index.html
+!docs/index.scss
+!docs/index.tsx
 
 npm-debug.log*
 yarn-debug.log*

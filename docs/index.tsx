@@ -5,22 +5,21 @@ import './index.scss';
 
 const Demo: React.FC = () => {
     const [text, setText] = useState('');
-    const options = ["mai", "ma", "manicure", "mandible", "man", "woman", "worm", "men", "must"];
+    const options = ['Papaya', 'Persimmon', 'Pear', 'Peach', 'Apples', 'Apricots', 'Avocados'];
 
     return (
-        <div>
+        <div className='demo'>
             <p>
                 Try typing any of the words in the array below:
             </p>
-            <p>
-                ["mai", "ma", "manicure", "mandible", "man", "woman", "worm", "men", "must"]
-            </p>
-            <div className="input-wrapper">
-                <Hint options={options} disableHint={false}>
+            <code>
+                ["Papaya", "Persimmon", "Pear", "Peach", "Apples", "Apricots", "Avocados"]
+            </code>
+            <div className='input-wrapper'>
+                <Hint options={options}>
                     <input
-                        className="input-with-hint"
+                        className='input-with-hint'
                         value={text}
-                        type="text"
                         onChange={e => setText(e.target.value)} />
                 </Hint>
             </div>

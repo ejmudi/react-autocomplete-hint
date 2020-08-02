@@ -4,16 +4,16 @@ module.exports = {
     mode: "development",
     entry: {
         app: [
-            './demo/index.tsx'
+            './docs/index.tsx'
         ]
     },
     devServer: {
-        contentBase: './demo',
+        contentBase: './docs',
         hot: true
     },
     output: {
         filename: '[name].bundle.js',
-        path: path.resolve(__dirname, './demo')
+        path: path.resolve(__dirname, './docs')
     },
     resolve: {
         extensions: [".ts", ".tsx", ".js"]
