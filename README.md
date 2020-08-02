@@ -44,3 +44,5 @@ List of options for autocomplete.
 
 ## License
 [MIT](LICENSE)
+
+Inspired by [React Bootstrap Typeahead](https://github.com/ericgio/react-bootstrap-typeahead).
