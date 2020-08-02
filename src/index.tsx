@@ -42,7 +42,13 @@ export const Hint: React.FC<IHintProps> = props => {
         const match = options
             .filter(x => x.toLowerCase() !== text.toLowerCase() && x.toLowerCase().startsWith(text.toLowerCase()))
             .sort()[0];
-        return match || '';
+
+        // While Text matching is case-insensitive, the casing entered by the user so far should be 
+        // preserved in the hint for UX benefits and also without the preservation, the hint won't
+        // overlap well if user types a different case from the selected option.
+        return match
+            ? text + match.slice(text.length)
+            : '';
     };
 
     const styleHint = (

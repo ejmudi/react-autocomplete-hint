@@ -10,7 +10,7 @@ const Demo: React.FC = () => {
     return (
         <div className='demo'>
             <p>
-                Try typing any of the words in the array below:
+                Try typing any of the words in the list below:
             </p>
             <code>
                 ["Papaya", "Persimmon", "Pear", "Peach", "Apples", "Apricots", "Avocados"]
@@ -23,6 +23,9 @@ const Demo: React.FC = () => {
                         onChange={e => setText(e.target.value)} />
                 </Hint>
             </div>
+            <p>
+                Github Repo: <a href="https://github.com/ejmudi/react-autocomplete-hint">https://github.com/ejmudi/react-autocomplete-hint</a>
+            </p>
         </div>
     );
 }
