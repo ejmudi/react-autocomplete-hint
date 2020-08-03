@@ -104,6 +104,7 @@ export const Hint: React.FC<IHintProps> = props => {
             ...childProps,
             onChange,
             onBlur,
+            onFocus: onChange,
             onKeyDown,
             ref: mergeRefs(childProps.ref, mainInputRef)
         }
