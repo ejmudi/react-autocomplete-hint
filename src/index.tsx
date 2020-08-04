@@ -72,7 +72,7 @@ export const Hint: React.FC<IHintProps> = props => {
         childProps.onChange && childProps.onChange(e);
     };
 
-    const onFocus = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const onFocus = (e: React.FocusEvent<HTMLInputElement>) => {
         setHint(getHint(e.target.value));
         childProps.onFocus && childProps.onFocus(e);
     };
