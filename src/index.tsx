@@ -72,6 +72,10 @@ export const Hint: React.FC<IHintProps> = props => {
         childProps.onChange && childProps.onChange(e);
     };
 
+    const onFocus = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setHint(getHint(e.target.value));
+    };
+
     const onBlur = (e: React.FocusEvent<HTMLInputElement>) => {
         setHint('');
         childProps.onBlur && childProps.onBlur(e);
@@ -104,7 +108,7 @@ export const Hint: React.FC<IHintProps> = props => {
             ...childProps,
             onChange,
             onBlur,
-            onFocus: onChange,
+            onFocus,
             onKeyDown,
             ref: mergeRefs(childProps.ref, mainInputRef)
         }
