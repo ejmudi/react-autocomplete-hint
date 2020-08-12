@@ -10,16 +10,18 @@ import { mergeRefs, interpolateStyle } from './utils';
 export interface IHintProps {
     options: Array<string>;
     disableHint?: boolean;
+    children: ReactElement;
 }
 
 export const Hint: React.FC<IHintProps> = props => {
+    const child = React.Children.only(props.children) as ReactElement<React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>>;
+
     const {
         options,
-        children: child,
         disableHint
     } = props;
 
-    const childProps = (child as ReactElement).props;
+    const childProps = child.props;
 
     let mainInputRef = useRef<HTMLInputElement>(null);
     let hintRef = useRef<HTMLInputElement>(null);
@@ -96,7 +98,7 @@ export const Hint: React.FC<IHintProps> = props => {
 
             if (cursorIsAtTextEnd && hint !== '' && e.currentTarget.value !== hint) {
                 e.currentTarget.value = hint;
-                childProps.onChange(e);
+                childProps.onChange && childProps.onChange(e as any);
                 setHint('');
             }
         }
@@ -111,7 +113,9 @@ export const Hint: React.FC<IHintProps> = props => {
             onBlur,
             onFocus,
             onKeyDown,
-            ref: mergeRefs(childProps.ref, mainInputRef)
+            ref: childProps.ref && typeof childProps.ref !== 'string'
+                ? mergeRefs(childProps.ref, mainInputRef)
+                : mainInputRef
         }
     );
 
