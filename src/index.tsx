@@ -11,6 +11,7 @@ export interface IHintProps {
     options: Array<string>;
     disableHint?: boolean;
     children: ReactElement;
+    allowTabFill?: boolean;
 }
 
 export const Hint: React.FC<IHintProps> = props => {
@@ -18,7 +19,8 @@ export const Hint: React.FC<IHintProps> = props => {
 
     const {
         options,
-        disableHint
+        disableHint,
+        allowTabFill
     } = props;
 
     const childProps = child.props;
@@ -85,8 +87,9 @@ export const Hint: React.FC<IHintProps> = props => {
     };
 
     const RIGHT = 39;
+    const TAB = 9;
     const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.keyCode === RIGHT) {
+        if (e.keyCode === RIGHT || e.keyCode === TAB) {
             // For selectable input types ("text", "search"), only select the hint if
             // it's at the end of the input value. For non-selectable types ("email",
             // "number"), always select the hint.
@@ -96,11 +99,17 @@ export const Hint: React.FC<IHintProps> = props => {
                 ? true
                 : e.currentTarget.selectionEnd === e.currentTarget.value.length
 
+            
+            if(allowTabFill && hint!==""){
+                //If pressed Tab dont jump to next tab index
+                e.preventDefault(); 
+            }
+
             if (cursorIsAtTextEnd && hint !== '' && e.currentTarget.value !== hint) {
                 e.currentTarget.value = hint;
                 childProps.onChange && childProps.onChange(e as any);
                 setHint('');
-            }
+            } 
         }
         childProps.onKeyDown && childProps.onKeyDown(e);
     };
