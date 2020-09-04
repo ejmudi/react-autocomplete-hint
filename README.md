@@ -29,29 +29,18 @@ import { Hint } from 'react-autocomplete-hint';
         onChange={e => setText(e.target.value)} />
 </Hint>
 
-//To enable tab key
-<Hint options={["orange", "banana", "apple"]} allowTabFill>
-    <input
-        value={text}
-        onChange={e => setText(e.target.value)} />
-</Hint>
-
 ```
 
-Use your keyboard **Right key** or **Tab key** to fill your input with the suggested hint.
+Use your keyboard **Right** key or **Tab** key(if `allowTabFill` is set to true) to fill your input with the suggested hint.
 
 
 ## Props
 
 #### options (required): `Array<string>`
 
-List of options for autocomplete.
-
 #### disableHint (optional): `Boolean`
 
 #### allowTabFill (optional):`Boolean`
-
-To enable tab to complete auto hint
 
 
 ## License

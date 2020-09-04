@@ -5,7 +5,6 @@ import './index.scss';
 
 const Demo: React.FC = () => {
     const [text, setText] = useState('');
-    const [tabInput,setTabInput] = useState('');
     const options = ['Papaya', 'Persimmon', 'Pear', 'Peach', 'Apples', 'Apricots', 'Avocados'];
 
     return (
@@ -17,22 +16,11 @@ const Demo: React.FC = () => {
                 ["Papaya", "Persimmon", "Pear", "Peach", "Apples", "Apricots", "Avocados"]
             </code>
             <div className='input-wrapper'>
-                <Hint options={options}>
+                <Hint options={options} allowTabFill>
                     <input
                         className='input-with-hint'
                         value={text}
                         onChange={e => setText(e.target.value)} />
-                </Hint>
-            </div>
-            <p>
-                If want to use tab key
-            </p>
-            <div className='input-wrapper'>
-            <Hint options={options} allowTabFill>
-                    <input
-                        className='input-with-hint'
-                        value={tabInput}
-                        onChange={e => setTabInput(e.target.value)} />
                 </Hint>
             </div>
             <p>
