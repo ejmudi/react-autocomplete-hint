@@ -11,6 +11,7 @@ export interface IHintProps {
     options: Array<string>;
     disableHint?: boolean;
     children: ReactElement;
+    allowTabFill?: boolean;
 }
 
 export const Hint: React.FC<IHintProps> = props => {
@@ -18,7 +19,8 @@ export const Hint: React.FC<IHintProps> = props => {
 
     const {
         options,
-        disableHint
+        disableHint,
+        allowTabFill
     } = props;
 
     const childProps = child.props;
@@ -85,8 +87,9 @@ export const Hint: React.FC<IHintProps> = props => {
     };
 
     const RIGHT = 39;
+    const TAB = 9;
     const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.keyCode === RIGHT) {
+        const cursorIsAtTextEnd = (() => {
             // For selectable input types ("text", "search"), only select the hint if
             // it's at the end of the input value. For non-selectable types ("email",
             // "number"), always select the hint.
@@ -94,14 +97,26 @@ export const Hint: React.FC<IHintProps> = props => {
             const isNonSelectableType = e.currentTarget.selectionEnd == null;
             const cursorIsAtTextEnd = isNonSelectableType
                 ? true
-                : e.currentTarget.selectionEnd === e.currentTarget.value.length
+                : e.currentTarget.selectionEnd === e.currentTarget.value.length;
 
-            if (cursorIsAtTextEnd && hint !== '' && e.currentTarget.value !== hint) {
+            return cursorIsAtTextEnd;
+        })();
+
+        const setAvailableHint = () => {
+            if (hint !== '' && e.currentTarget.value !== hint) {
                 e.currentTarget.value = hint;
                 childProps.onChange && childProps.onChange(e as any);
                 setHint('');
             }
+        };
+
+        if (cursorIsAtTextEnd && e.keyCode === RIGHT) {
+            setAvailableHint();
+        } else if (cursorIsAtTextEnd && allowTabFill && e.keyCode === TAB && hint !== '') {
+            e.preventDefault();
+            setAvailableHint();
         }
+
         childProps.onKeyDown && childProps.onKeyDown(e);
     };
 
