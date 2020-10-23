@@ -86,20 +86,20 @@ export const Hint: React.FC<IHintProps> = props => {
         childProps.onBlur && childProps.onBlur(e);
     };
 
-    const RIGHT = 39;
-    const TAB = 9;
+    const ARROWRIGHT = 'ArrowRight';
+    const TAB = 'Tab';
     const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        const cursorIsAtTextEnd = (() => {
+        const caretIsAtTextEnd = (() => {
             // For selectable input types ("text", "search"), only select the hint if
             // it's at the end of the input value. For non-selectable types ("email",
             // "number"), always select the hint.
 
             const isNonSelectableType = e.currentTarget.selectionEnd == null;
-            const cursorIsAtTextEnd = isNonSelectableType
+            const caretIsAtTextEnd = isNonSelectableType
                 ? true
                 : e.currentTarget.selectionEnd === e.currentTarget.value.length;
 
-            return cursorIsAtTextEnd;
+            return caretIsAtTextEnd;
         })();
 
         const setAvailableHint = () => {
@@ -110,9 +110,9 @@ export const Hint: React.FC<IHintProps> = props => {
             }
         };
 
-        if (cursorIsAtTextEnd && e.keyCode === RIGHT) {
+        if (caretIsAtTextEnd && e.key === ARROWRIGHT) {
             setAvailableHint();
-        } else if (cursorIsAtTextEnd && allowTabFill && e.keyCode === TAB && hint !== '') {
+        } else if (caretIsAtTextEnd && allowTabFill && e.key === TAB && hint !== '') {
             e.preventDefault();
             setAvailableHint();
         }
