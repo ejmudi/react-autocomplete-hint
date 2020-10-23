@@ -1,5 +1,7 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react';
+import '@testing-library/jest-dom/extend-expect';
+import userEvent from '@testing-library/user-event';
 import { Hint } from '..';
 
 const options = ['Persimmon', 'Pear', 'Papaya', 'Peach', 'Apples', 'Apricots', 'Avocados'];
@@ -77,9 +79,8 @@ describe('Hint input without allowTabFill prop', () => {
 
         const inputs = container.getElementsByTagName('input');
         const input1 = inputs[0],
-        hint1 = inputs[1],
-        input2 = inputs[2],
-        hint2 = inputs[3];
+            input2 = inputs[2],
+            hint2 = inputs[3];
 
         fireEvent.change(input1, { target: { value: 'Pe' } });
         expect(hint2.value).toBe('');
@@ -118,11 +119,69 @@ describe('Hint input with allowTabFill prop set to true', () => {
         expect(hint.value).toBe('');
     });
 
-    it(`should not autocomplete input with hint when caret is not at the end of text`, () => {
+    it(`should not autocomplete input with hint when caret is not at the end of the input text`, () => {
         fireEvent.change(input, { target: { value: 'Pe', selectionEnd: 1 } });
         fireEvent.keyDown(input, { key: 'Tab' });
         fireEvent.keyDown(input, { key: 'ArrowRight' });
 
         expect(input.value).toBe('Pe');
+    });
+});
+
+describe('Hint input with allowTabFill prop set to true alongside another input', () => {
+    let nextInput: HTMLInputElement;
+
+    beforeEach(() => {
+        const { container } = render(
+            <>
+                <Hint options={options} allowTabFill>
+                    <input onChange={handleChange} />
+                </Hint>
+                <input id='next-input' onChange={handleChange} />
+            </>
+        );
+
+        input = container.getElementsByTagName('input')[0];
+        nextInput = container.getElementsByTagName('input')[2];
+    });
+
+    it(`should not move focus to the next-input when there's a value to autofill and Tab button is pressed`, () => {
+        input.focus();
+        fireEvent.change(input, { target: { value: 'Pe' } });
+        userEvent.tab();
+
+        expect(input).toHaveFocus();
+    });
+
+    it(`should move focus to the next-input when the caret is not at the end of the main-input text and Tab button is pressed`, () => {
+        input.focus();
+        fireEvent.change(input, { target: { value: 'Pea', selectionEnd: 1 } });
+        userEvent.tab();
+
+        expect(nextInput).toHaveFocus();
+    });
+
+    it(`should move focus to the next-input when the main-input is empty and Tab button is pressed`, () => {
+        input.focus();
+        fireEvent.change(input, { target: { value: '', } });
+        userEvent.tab();
+
+        expect(nextInput).toHaveFocus();
+    });
+
+    it(`should go to the next tabIndex when there's no hint suggestion and Tab button is pressed`, () => {
+        input.focus();
+        fireEvent.change(input, { target: { value: 'RandomText' } });
+        userEvent.tab();
+
+        expect(nextInput).toHaveFocus();
+    });
+
+    it(`should go to the next tabIndex when one of the options is typed and there's no hint suggestion and Tab button is pressed`, () => {
+        input.focus();
+        fireEvent.change(input, { target: { value: 'Pear' } });
+        userEvent.tab();
+
+        expect(nextInput).toHaveFocus();
     });
 });
