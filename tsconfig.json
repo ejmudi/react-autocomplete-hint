@@ -6,5 +6,9 @@
     "declaration": true,
     "outDir": "dist",
     "strict": true
-  }
+  },
+  "exclude": [
+    "node_modules",
+    "src/__tests__"
+  ]
 }
