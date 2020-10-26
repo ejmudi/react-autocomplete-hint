@@ -31,7 +31,7 @@ import { Hint } from 'react-autocomplete-hint';
 
 ```
 
-Use your keyboard **Right** key or **Tab** key(if `allowTabFill` is set to true) to fill your input with the suggested hint.
+Click on the hint or use your keyboard **Right** key or **Tab** key(if `allowTabFill` is set to true) to fill your input with the suggested hint.
 
 
 ## Props
