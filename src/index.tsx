@@ -9,7 +9,6 @@ import { mergeRefs, interpolateStyle } from './utils';
 
 export interface IHintProps {
     options: Array<string>;
-    onChangeHandler(value: string): unknown;
     disableHint?: boolean;
     children: ReactElement;
     allowTabFill?: boolean;
@@ -20,7 +19,6 @@ export const Hint: React.FC<IHintProps> = props => {
 
     const {
         options,
-        onChangeHandler,
         disableHint,
         allowTabFill
     } = props;
@@ -32,6 +30,7 @@ export const Hint: React.FC<IHintProps> = props => {
     let hintRef = useRef<HTMLInputElement>(null);
     const [text, setText] = useState('');
     const [hint, setHint] = useState('');
+    const [changeEvent, setChangeEvent] = useState<React.ChangeEvent<HTMLInputElement>>();
 
     useEffect(() => {
         if (disableHint) {
@@ -58,8 +57,11 @@ export const Hint: React.FC<IHintProps> = props => {
 
     const setAvailableHint = () => {
         if (hint !== '') {
-            onChangeHandler(text + hint);
-            setHint('');
+            if (changeEvent) {
+                changeEvent.target.value = text + hint;
+                childProps.onChange && childProps.onChange(changeEvent);
+                setHint('');
+            }
         }
     };
 
@@ -88,6 +90,9 @@ export const Hint: React.FC<IHintProps> = props => {
     };
 
     const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setChangeEvent(e);
+        e.persist();
+
         setText(e.target.value);
         setHint(getHint(e.target.value));
         childProps.onChange && childProps.onChange(e);
@@ -100,9 +105,9 @@ export const Hint: React.FC<IHintProps> = props => {
 
     const onBlur = (e: React.FocusEvent<HTMLInputElement>) => {
         //Only blur it if the new focus isn't the the hint input
-        if(hintRef?.current !== e.relatedTarget){
+        if (hintRef?.current !== e.relatedTarget) {
             setHint('');
-            childProps.onBlur && childProps.onBlur(e);    
+            childProps.onBlur && childProps.onBlur(e);
         }
     };
 
@@ -137,18 +142,18 @@ export const Hint: React.FC<IHintProps> = props => {
 
         // If user clicks the position before the first character of the hint, 
         // move focus to the end of the mainInput text
-        // if(hintCaretPosition === 0) {
-        //     mainInputRef.current?.focus();
-        //     return;
-        // }
+        if(hintCaretPosition === 0) {
+            mainInputRef.current?.focus();
+            return;
+        }
 
         if (!!hint && hint !== '') {
             setAvailableHint();
-            //setTimeout(() => {
-                // mainInputRef.current?.focus();
-                // const caretPosition = text.length + hintCaretPosition;
-                // mainInputRef.current?.setSelectionRange(caretPosition, caretPosition);
-           // }, 0);
+            setTimeout(() => {
+                mainInputRef.current?.focus();
+                const caretPosition = text.length + hintCaretPosition;
+                mainInputRef.current?.setSelectionRange(caretPosition, caretPosition);
+            }, 0);
         }
     };
 
@@ -197,7 +202,7 @@ export const Hint: React.FC<IHintProps> = props => {
                                     top: 0,
                                     left: 0,
                                 }}
-                                
+
                             >
                                 <span
                                     style={{
@@ -208,6 +213,7 @@ export const Hint: React.FC<IHintProps> = props => {
                                     {text}
                                 </span>
                                 <input
+                                    className="rah-hint"
                                     ref={hintRef}
                                     onClick={onHintClick}
                                     style={{
