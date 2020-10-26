@@ -16,7 +16,7 @@ const Demo: React.FC = () => {
                 ["Papaya", "Persimmon", "Pear", "Peach", "Apples", "Apricots", "Avocados"]
             </code>
             <div className='input-wrapper'>
-                <Hint options={options} allowTabFill>
+                <Hint options={options} onChangeHandler={setText} allowTabFill>
                     <input
                         className='input-with-hint'
                         value={text}

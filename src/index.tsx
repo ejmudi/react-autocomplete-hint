@@ -9,6 +9,7 @@ import { mergeRefs, interpolateStyle } from './utils';
 
 export interface IHintProps {
     options: Array<string>;
+    onChangeHandler(value: string): unknown;
     disableHint?: boolean;
     children: ReactElement;
     allowTabFill?: boolean;
@@ -19,6 +20,7 @@ export const Hint: React.FC<IHintProps> = props => {
 
     const {
         options,
+        onChangeHandler,
         disableHint,
         allowTabFill
     } = props;
@@ -26,7 +28,9 @@ export const Hint: React.FC<IHintProps> = props => {
     const childProps = child.props;
 
     let mainInputRef = useRef<HTMLInputElement>(null);
+    let hintWrapperRef = useRef<HTMLSpanElement>(null);
     let hintRef = useRef<HTMLInputElement>(null);
+    const [text, setText] = useState('');
     const [hint, setHint] = useState('');
 
     useEffect(() => {
@@ -35,7 +39,7 @@ export const Hint: React.FC<IHintProps> = props => {
         }
 
         const inputStyle = mainInputRef.current && window.getComputedStyle(mainInputRef.current);
-        inputStyle && styleHint(hintRef, inputStyle);
+        inputStyle && styleHint(hintWrapperRef, hintRef, inputStyle);
     });
 
     const getHint = (text: string) => {
@@ -47,31 +51,44 @@ export const Hint: React.FC<IHintProps> = props => {
             .filter(x => x.toLowerCase() !== text.toLowerCase() && x.toLowerCase().startsWith(text.toLowerCase()))
             .sort()[0];
 
-        // While Text matching is case-insensitive, the casing entered by the user so far should be 
-        // preserved in the hint for UX benefits and also without the preservation, the hint won't
-        // overlap well if user types a different case from the selected option.
         return match
-            ? text + match.slice(text.length)
+            ? match.slice(text.length)
             : '';
     };
 
+    const setAvailableHint = () => {
+        if (hint !== '') {
+            onChangeHandler(text + hint);
+            setHint('');
+        }
+    };
+
     const styleHint = (
+        hintWrapperRef: React.RefObject<HTMLSpanElement>,
         hintRef: React.RefObject<HTMLInputElement>,
         inputStyle: CSSStyleDeclaration) => {
+        if (hintWrapperRef?.current?.style) {
+            hintWrapperRef.current.style.fontFamily = inputStyle.fontFamily;
+            hintWrapperRef.current.style.fontSize = inputStyle.fontSize;
+            hintWrapperRef.current.style.width = inputStyle.width;
+            hintWrapperRef.current.style.height = inputStyle.height;
+            hintWrapperRef.current.style.lineHeight = inputStyle.lineHeight;
+            hintWrapperRef.current.style.boxSizing = inputStyle.boxSizing;
+            hintWrapperRef.current.style.margin = interpolateStyle(inputStyle, 'margin');
+            hintWrapperRef.current.style.padding = interpolateStyle(inputStyle, 'padding');
+            hintWrapperRef.current.style.borderStyle = interpolateStyle(inputStyle, 'border', 'style');
+            hintWrapperRef.current.style.borderWidth = interpolateStyle(inputStyle, 'border', 'width');
+        }
+
         if (hintRef?.current?.style) {
+            hintRef.current.style.fontFamily = inputStyle.fontFamily;
             hintRef.current.style.fontSize = inputStyle.fontSize;
-            hintRef.current.style.width = inputStyle.width;
-            hintRef.current.style.height = inputStyle.height;
             hintRef.current.style.lineHeight = inputStyle.lineHeight;
-            hintRef.current.style.boxSizing = inputStyle.boxSizing;
-            hintRef.current.style.margin = interpolateStyle(inputStyle, 'margin');
-            hintRef.current.style.padding = interpolateStyle(inputStyle, 'padding');
-            hintRef.current.style.borderStyle = interpolateStyle(inputStyle, 'border', 'style');
-            hintRef.current.style.borderWidth = interpolateStyle(inputStyle, 'border', 'width');
         }
     };
 
     const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setText(e.target.value);
         setHint(getHint(e.target.value));
         childProps.onChange && childProps.onChange(e);
     };
@@ -82,8 +99,11 @@ export const Hint: React.FC<IHintProps> = props => {
     };
 
     const onBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-        setHint('');
-        childProps.onBlur && childProps.onBlur(e);
+        //Only blur it if the new focus isn't the the hint input
+        if(hintRef?.current !== e.relatedTarget){
+            setHint('');
+            childProps.onBlur && childProps.onBlur(e);    
+        }
     };
 
     const ARROWRIGHT = 'ArrowRight';
@@ -102,14 +122,6 @@ export const Hint: React.FC<IHintProps> = props => {
             return caretIsAtTextEnd;
         })();
 
-        const setAvailableHint = () => {
-            if (hint !== '' && e.currentTarget.value !== hint) {
-                e.currentTarget.value = hint;
-                childProps.onChange && childProps.onChange(e as any);
-                setHint('');
-            }
-        };
-
         if (caretIsAtTextEnd && e.key === ARROWRIGHT) {
             setAvailableHint();
         } else if (caretIsAtTextEnd && allowTabFill && e.key === TAB && hint !== '') {
@@ -120,10 +132,33 @@ export const Hint: React.FC<IHintProps> = props => {
         childProps.onKeyDown && childProps.onKeyDown(e);
     };
 
+    const onHintClick = (e: React.MouseEvent<HTMLInputElement>) => {
+        const hintCaretPosition = e.currentTarget.selectionEnd || 0;
+
+        // If user clicks the position before the first character of the hint, 
+        // move focus to the end of the mainInput text
+        // if(hintCaretPosition === 0) {
+        //     mainInputRef.current?.focus();
+        //     return;
+        // }
+
+        if (!!hint && hint !== '') {
+            setAvailableHint();
+            //setTimeout(() => {
+                // mainInputRef.current?.focus();
+                // const caretPosition = text.length + hintCaretPosition;
+                // mainInputRef.current?.setSelectionRange(caretPosition, caretPosition);
+           // }, 0);
+        }
+    };
+
     const mainInput = cloneElement(
         child as any,
         {
             ...childProps,
+            style: {
+                boxSizing: 'border-box'
+            },
             onChange,
             onBlur,
             onFocus,
@@ -147,22 +182,51 @@ export const Hint: React.FC<IHintProps> = props => {
                     : (
                         <>
                             {mainInput}
-                            <input
-                                className="rah-input-hint"
-                                defaultValue={hint}
-                                ref={hintRef}
+                            <span
+                                className="rah-hint-wrapper"
+                                ref={hintWrapperRef}
                                 style={{
+                                    display: 'flex',
+                                    pointerEvents: 'none',
                                     backgroundColor: 'transparent',
                                     borderColor: 'transparent',
+                                    boxSizing: 'border-box',
                                     boxShadow: 'none',
                                     color: 'rgba(0, 0, 0, 0.35)',
-                                    pointerEvents: 'none',
                                     position: 'absolute',
                                     top: 0,
-                                    left: 0
+                                    left: 0,
                                 }}
-                                tabIndex={-1}
-                            />
+                                
+                            >
+                                <span
+                                    style={{
+                                        visibility: 'hidden',
+                                        pointerEvents: 'none'
+                                    }}
+                                >
+                                    {text}
+                                </span>
+                                <input
+                                    ref={hintRef}
+                                    onClick={onHintClick}
+                                    style={{
+                                        pointerEvents: !hint || hint === '' ? 'none' : 'visible',
+                                        background: 'transparent',
+                                        width: '100%',
+                                        outline: 'none',
+                                        border: 'none',
+                                        boxShadow: 'none',
+                                        padding: 0,
+                                        margin: 0,
+                                        color: 'rgba(0, 0, 0, 0.35)',
+                                        caretColor: 'transparent'
+                                    }}
+                                    value={hint}
+                                    onChange={() => null}
+                                    tabIndex={-1}
+                                />
+                            </span>
                         </>
                     )
             }
