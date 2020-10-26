@@ -1,6 +1,9 @@
 # react-autocomplete-hint
 A React component for Autocomplete Hint.
 
+![NPM](https://img.shields.io/npm/l/react-autocomplete-hint)
+![npm](https://img.shields.io/npm/v/react-autocomplete-hint)
+
 ![](demo/demo.gif)
 
 
