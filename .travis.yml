@@ -1,0 +1,9 @@
+language: node_js
+node_js:
+  - lts/*
+before_script:
+  - npm install codecov -g
+script:
+  - npm coverage
+after_success:
+  - codecov

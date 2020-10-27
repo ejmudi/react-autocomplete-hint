@@ -3,6 +3,8 @@ A React component for Autocomplete Hint.
 
 ![NPM](https://img.shields.io/npm/l/react-autocomplete-hint)
 ![npm](https://img.shields.io/npm/v/react-autocomplete-hint)
+[![Build Status](https://travis-ci.com/ejmudi/react-autocomplete-hint.svg?branch=master)](https://travis-ci.com/ejmudi/react-autocomplete-hint)
+[![codecov](https://codecov.io/gh/ejmudi/react-autocomplete-hint/graph/badge.svg)](https://codecov.io/gh/ejmudi/react-autocomplete-hint)
 
 ![](demo/demo.gif)
 
