@@ -4,6 +4,6 @@ node_js:
 before_script:
   - npm install codecov -g
 script:
-  - npm coverage
+  - npm run coverage
 after_success:
   - codecov
