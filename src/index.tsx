@@ -15,7 +15,7 @@ export interface IHintProps {
 }
 
 export const Hint: React.FC<IHintProps> = props => {
-    const child = React.Children.only(props.children) as ReactElement<React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>>;
+    const child = React.Children.only(props.children);
 
     const {
         options,
@@ -142,7 +142,7 @@ export const Hint: React.FC<IHintProps> = props => {
 
         // If user clicks the position before the first character of the hint, 
         // move focus to the end of the mainInput text
-        if(hintCaretPosition === 0) {
+        if (hintCaretPosition === 0) {
             mainInputRef.current?.focus();
             return;
         }
@@ -157,19 +157,21 @@ export const Hint: React.FC<IHintProps> = props => {
         }
     };
 
+    const childRef = cloneElement(child as any).ref;
     const mainInput = cloneElement(
-        child as any,
+        child,
         {
             ...childProps,
             style: {
+                ...childProps.style,
                 boxSizing: 'border-box'
             },
             onChange,
             onBlur,
             onFocus,
             onKeyDown,
-            ref: childProps.ref && typeof childProps.ref !== 'string'
-                ? mergeRefs(childProps.ref, mainInputRef)
+            ref: childRef && typeof(childRef) !== 'string'
+                ? mergeRefs(childRef, mainInputRef)
                 : mainInputRef
         }
     );

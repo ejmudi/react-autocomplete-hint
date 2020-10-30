@@ -2,11 +2,10 @@ import { MutableRefObject, RefCallback } from "react";
 
 type MutableRef<T> = RefCallback<T> | MutableRefObject<T> | null;
 
-export function mergeRefs(...refs: Array<MutableRef<HTMLInputElement | null>>) {
+export function mergeRefs(...refs: Array<MutableRef<HTMLElement | null>>) {
     const filteredRefs = refs.filter(Boolean);
-    if (!filteredRefs.length) return null;
-    if (filteredRefs.length === 0) return filteredRefs[0];
-    return (inst: HTMLInputElement) => {
+    
+    return (inst: HTMLElement) => {
         for (let ref of filteredRefs) {
             if (typeof ref === 'function') {
                 ref(inst);

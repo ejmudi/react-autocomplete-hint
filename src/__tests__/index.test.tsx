@@ -1,13 +1,15 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { render, fireEvent } from '@testing-library/react';
-import '@testing-library/jest-dom/extend-expect';
 import userEvent from '@testing-library/user-event';
 import { Hint } from '..';
+import { renderHook } from '@testing-library/react-hooks';
+import '@testing-library/jest-dom/extend-expect';
 
 const options = ['Persimmon', 'Pear', 'Papaya', 'Peach', 'Apples', 'Apricots', 'Avocados'];
 const handleChange = jest.fn();
 let input: HTMLInputElement;
 let hint: HTMLInputElement;
+let hintWrapper: HTMLSpanElement;
 
 describe('Hint input without allowTabFill prop', () => {
     beforeEach(() => {
@@ -83,6 +85,17 @@ describe('Hint input without allowTabFill prop', () => {
         fireEvent.keyDown(input1, { key: 'ArrowRight' });
         expect(input2.value).toBe('');
         expect(hint2.value).toBe('');
+    });
+
+    it('should not have autocomplete functionality when disableHint is set to true', () => {
+        const { container } = render(
+            <Hint options={options} disableHint={true}>
+                <input onChange={handleChange} />
+            </Hint>
+        );
+
+        const inputs = container.getElementsByTagName('input');
+        expect(inputs.length).toBe(1);
     });
 });
 
@@ -223,5 +236,54 @@ describe('Hint input with onClick autocomplete feature', () => {
         jest.runAllTimers();
 
         expect(input.selectionEnd).toBe(5);
+    });
+});
+
+describe('Hint with ref set on input', () => {
+    it('should preserve a non-callback ref set on the input', () => {
+        const { result } = renderHook(() => useRef<HTMLInputElement>(null));
+        const inputRef = result.current;
+
+        const { container } = render(
+            <Hint options={options}>
+                <input onChange={handleChange} ref={inputRef} />
+            </Hint>
+        );
+
+        input = container.getElementsByTagName('input')[0];
+        hint = container.getElementsByTagName('input')[1];
+        hintWrapper = container.getElementsByClassName('rah-hint-wrapper')[0] as HTMLSpanElement;
+
+        if (inputRef.current) {
+            inputRef.current.style.lineHeight = '1.5px';
+        }
+
+        fireEvent.change(input, { target: { value: 'a' } });
+
+        expect(hintWrapper.style.lineHeight).toBe('1.5px');
+        expect(hint.style.lineHeight).toBe('1.5px');
+    });
+
+    it('should preserve callback ref set on the input', () => {
+        let inputRef: any;
+
+        const { container } = render(
+            <Hint options={options}>
+                <input onChange={handleChange} ref={element => {
+                    inputRef = element;
+                }} />
+            </Hint>
+        );
+
+        input = container.getElementsByTagName('input')[0];
+        hint = container.getElementsByTagName('input')[1];
+        hintWrapper = container.getElementsByClassName('rah-hint-wrapper')[0] as HTMLSpanElement;
+
+        inputRef.style.lineHeight = '1.5px';
+
+        fireEvent.change(input, { target: { value: 'a' } });
+
+        expect(hintWrapper.style.lineHeight).toBe('1.5px');
+        expect(hint.style.lineHeight).toBe('1.5px');
     });
 });
