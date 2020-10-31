@@ -33,3 +33,13 @@ export function interpolateStyle(
         .map((dir) => styles[attr + dir + subattr])
         .join(' ');
 }
+
+export function sortAsc<T> (a: T, b: T) {
+    if (a > b) {
+        return 1;
+    }
+    if (a < b) {
+        return -1;
+    }
+    return 0;
+}

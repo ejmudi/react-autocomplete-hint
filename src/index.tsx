@@ -5,13 +5,23 @@ import React, {
     useRef,
     ReactElement
 } from 'react';
-import { mergeRefs, interpolateStyle } from './utils';
+import {
+    mergeRefs,
+    interpolateStyle,
+    sortAsc
+} from './utils';
+
+export interface IHintOption {
+    id: string | number;
+    text: string;
+}
 
 export interface IHintProps {
-    options: Array<string>;
+    options: Array<string | IHintOption>;
     disableHint?: boolean;
     children: ReactElement;
     allowTabFill?: boolean;
+    onAutoComplete?(value: string | IHintOption): void;
 }
 
 export const Hint: React.FC<IHintProps> = props => {
@@ -20,7 +30,8 @@ export const Hint: React.FC<IHintProps> = props => {
     const {
         options,
         disableHint,
-        allowTabFill
+        allowTabFill,
+        onAutoComplete
     } = props;
 
     const childProps = child.props;
@@ -30,6 +41,7 @@ export const Hint: React.FC<IHintProps> = props => {
     let hintRef = useRef<HTMLInputElement>(null);
     const [text, setText] = useState('');
     const [hint, setHint] = useState('');
+    const [hintId, setHintId] = useState<string | number>('');
     const [changeEvent, setChangeEvent] = useState<React.ChangeEvent<HTMLInputElement>>();
 
     useEffect(() => {
@@ -41,27 +53,58 @@ export const Hint: React.FC<IHintProps> = props => {
         inputStyle && styleHint(hintWrapperRef, hintRef, inputStyle);
     });
 
-    const getHint = (text: string) => {
+    const getMatch = (text: string) => {
         if (!text || text === '') {
-            return '';
+            return null;
         }
 
-        const match = options
-            .filter(x => x.toLowerCase() !== text.toLowerCase() && x.toLowerCase().startsWith(text.toLowerCase()))
-            .sort()[0];
+        if (typeof (options[0]) === 'string') {
+            const match = (options as Array<string>)
+                .filter(x => x.toLowerCase() !== text.toLowerCase() && x.toLowerCase().startsWith(text.toLowerCase()))
+                .sort()[0];
 
-        return match
-            ? match.slice(text.length)
-            : '';
+            return match;
+        } else {
+            const match = (options as Array<IHintOption>)
+                .filter(x => x.text.toLowerCase() !== text.toLowerCase() && x.text.toLowerCase().startsWith(text.toLowerCase()))
+                .sort((a, b) => sortAsc(a.text, b.text))[0];
+
+            return match;
+        }
     };
 
-    const setAvailableHint = () => {
-        if (hint !== '') {
-            if (changeEvent) {
-                changeEvent.target.value = text + hint;
-                childProps.onChange && childProps.onChange(changeEvent);
-                setHint('');
-            }
+    const setHintTextAndId = (text: string) => {
+        setText(text);
+
+        const match = getMatch(text);
+        let hint: string;
+        let hintId: string | number = '';
+
+        if (!match) {
+            hint = '';
+        }
+        else if (typeof match === 'string') {
+            hint = match.slice(text.length);
+        } else {
+            hint = match.text.slice(text.length);
+            hintId = match ? match.id : '';
+        }
+
+        setHint(hint);
+        setHintId(hintId);
+    }
+
+    const handleAutoComplete = () => {
+        if (hint !== '' && changeEvent) {
+            changeEvent.target.value = text + hint;
+            childProps.onChange && childProps.onChange(changeEvent);
+            setHintTextAndId('');
+
+            const selectedValue = typeof (options[0]) === 'string'
+                ? text + hint
+                : (options as Array<IHintOption>).filter(x => x.id === hintId)[0];
+
+            onAutoComplete && onAutoComplete(selectedValue);
         }
     };
 
@@ -93,20 +136,19 @@ export const Hint: React.FC<IHintProps> = props => {
         setChangeEvent(e);
         e.persist();
 
-        setText(e.target.value);
-        setHint(getHint(e.target.value));
+        setHintTextAndId(e.target.value);
         childProps.onChange && childProps.onChange(e);
     };
 
     const onFocus = (e: React.FocusEvent<HTMLInputElement>) => {
-        setHint(getHint(e.target.value));
+        setHintTextAndId(e.target.value);
         childProps.onFocus && childProps.onFocus(e);
     };
 
     const onBlur = (e: React.FocusEvent<HTMLInputElement>) => {
         //Only blur it if the new focus isn't the the hint input
         if (hintRef?.current !== e.relatedTarget) {
-            setHint('');
+            setHintTextAndId('');
             childProps.onBlur && childProps.onBlur(e);
         }
     };
@@ -128,10 +170,10 @@ export const Hint: React.FC<IHintProps> = props => {
         })();
 
         if (caretIsAtTextEnd && e.key === ARROWRIGHT) {
-            setAvailableHint();
+            handleAutoComplete();
         } else if (caretIsAtTextEnd && allowTabFill && e.key === TAB && hint !== '') {
             e.preventDefault();
-            setAvailableHint();
+            handleAutoComplete();
         }
 
         childProps.onKeyDown && childProps.onKeyDown(e);
@@ -148,7 +190,7 @@ export const Hint: React.FC<IHintProps> = props => {
         }
 
         if (!!hint && hint !== '') {
-            setAvailableHint();
+            handleAutoComplete();
             setTimeout(() => {
                 mainInputRef.current?.focus();
                 const caretPosition = text.length + hintCaretPosition;
@@ -170,7 +212,7 @@ export const Hint: React.FC<IHintProps> = props => {
             onBlur,
             onFocus,
             onKeyDown,
-            ref: childRef && typeof(childRef) !== 'string'
+            ref: childRef && typeof (childRef) !== 'string'
                 ? mergeRefs(childRef, mainInputRef)
                 : mainInputRef
         }
@@ -207,6 +249,7 @@ export const Hint: React.FC<IHintProps> = props => {
 
                             >
                                 <span
+                                    className='rah-text-filler'
                                     style={{
                                         visibility: 'hidden',
                                         pointerEvents: 'none'
