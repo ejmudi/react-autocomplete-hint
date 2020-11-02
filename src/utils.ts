@@ -1,10 +1,11 @@
 import { MutableRefObject, RefCallback } from "react";
+import { IHintOption } from "./IHintOption";
 
 type MutableRef<T> = RefCallback<T> | MutableRefObject<T> | null;
 
 export function mergeRefs(...refs: Array<MutableRef<HTMLElement | null>>) {
     const filteredRefs = refs.filter(Boolean);
-    
+
     return (inst: HTMLElement) => {
         for (let ref of filteredRefs) {
             if (typeof ref === 'function') {
@@ -34,7 +35,7 @@ export function interpolateStyle(
         .join(' ');
 }
 
-export function sortAsc<T> (a: T, b: T) {
+export function sortAsc<T>(a: T, b: T) {
     if (a > b) {
         return 1;
     }
@@ -42,4 +43,18 @@ export function sortAsc<T> (a: T, b: T) {
         return -1;
     }
     return 0;
+}
+
+export function getFirstDuplicateOption(array: Array<IHintOption>) {
+    let tracker: { [key: string]: boolean } = {};
+
+    for (let i = 0; i < array.length; i++) {
+        if (tracker[array[i].text]) {
+            return array[i].text;
+        }
+
+        tracker[array[i].text] = true;
+    }
+
+    return null;
 }

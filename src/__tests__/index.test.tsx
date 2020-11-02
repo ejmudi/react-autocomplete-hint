@@ -1,7 +1,8 @@
 import React, { useRef } from 'react';
 import { render, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { Hint, IHintOption } from '..';
+import { Hint } from '..';
+import { IHintOption } from '../IHintOption';
 import { renderHook } from '@testing-library/react-hooks';
 import '@testing-library/jest-dom/extend-expect';
 
@@ -37,8 +38,8 @@ const objectOptions = [
     }
 ];
 const handleChange = jest.fn();
-const ArrowRight = 'ArrowRight';
-const Tab = 'Tab';
+const ARROWRIGHT = 'ArrowRight';
+const TAB = 'Tab';
 let input: HTMLInputElement;
 let hint: HTMLInputElement;
 let textFiller: HTMLSpanElement;
@@ -81,7 +82,7 @@ describe('Hint input without allowTabFill prop', () => {
             const hint = inputs[1];
 
             fireEvent.change(input, { target: { value: 'Pe' } });
-            fireEvent.keyDown(input, { key: ArrowRight });
+            fireEvent.keyDown(input, { key: ARROWRIGHT });
             expect(handleOnAutoComplete).toHaveBeenCalledWith('Pea');
 
             input.focus();
@@ -93,7 +94,7 @@ describe('Hint input without allowTabFill prop', () => {
             input.focus();
 
             fireEvent.change(input, { target: { value: 'Per' } });
-            fireEvent.keyDown(input, { key: Tab });
+            fireEvent.keyDown(input, { key: TAB });
             expect(handleOnAutoComplete).toHaveBeenCalledTimes(2);
         });
 
@@ -128,6 +129,45 @@ describe('Hint input without allowTabFill prop', () => {
 
         runCommonTests();
 
+        it('should console warn user only once when two options have the same text', () => {
+            const objectOptions = [
+                {
+                    id: 1,
+                    text: 'pea'
+                },
+                {
+                    id: 2,
+                    text: 'papaya'
+                },
+                {
+                    id: 3,
+                    text: 'pea'
+                },
+                {
+                    id: 4,
+                    text: 'pear'
+                }
+            ];
+
+            console.warn = jest.fn();
+
+            const { container } = render(
+                <Hint options={objectOptions}>
+                    <input onChange={handleChange} />
+                </Hint>
+            );
+
+            input = container.getElementsByTagName('input')[0];
+
+            const warningMessage = `react-autocomplete-hint: "pea" occurs more than once and may cause errors. Options should not contain duplicate values!`;
+            expect(console.warn).toHaveBeenCalledWith(warningMessage);
+
+            fireEvent.change(input, { target: { value: 'pe' } });
+            fireEvent.keyDown(input, { key: ARROWRIGHT });
+
+            expect(console.warn).toHaveBeenCalledTimes(1);
+        });
+
         it('should call onAutoComplete callback once input gets filled with hint', () => {
             const handleOnAutoComplete = jest.fn();
 
@@ -141,7 +181,7 @@ describe('Hint input without allowTabFill prop', () => {
             const hint = inputs[1];
 
             fireEvent.change(input, { target: { value: 'Pe' } });
-            fireEvent.keyDown(input, { key: ArrowRight });
+            fireEvent.keyDown(input, { key: ARROWRIGHT });
             expect(handleOnAutoComplete).toHaveBeenCalledWith({
                 id: '3',
                 text: 'Pea'
@@ -159,7 +199,7 @@ describe('Hint input without allowTabFill prop', () => {
             input.focus();
 
             fireEvent.change(input, { target: { value: 'Per' } });
-            fireEvent.keyDown(input, { key: Tab });
+            fireEvent.keyDown(input, { key: TAB });
             expect(handleOnAutoComplete).toHaveBeenCalledTimes(2);
         });
 
@@ -210,7 +250,7 @@ describe('Hint input without allowTabFill prop', () => {
 
         it('should autoComplete the input correctly on press of right button', () => {
             fireEvent.change(input, { target: { value: 'ap' } });
-            fireEvent.keyDown(input, { key: ArrowRight });
+            fireEvent.keyDown(input, { key: ARROWRIGHT });
 
             expect(input.value).toBe('apples');
             expect(hint.value).toBe('');
@@ -236,7 +276,7 @@ describe('Hint input without allowTabFill prop', () => {
             fireEvent.change(input, { target: { value: 'pe' } });
             expect(hint.value).toBe('a');
 
-            fireEvent.keyDown(input, { key: ArrowRight });
+            fireEvent.keyDown(input, { key: ARROWRIGHT });
             expect(input.value).toBe('pea');
             expect(hint.value).toBe('');
             expect(textFiller.innerHTML).toBe('');
@@ -251,7 +291,7 @@ describe('Hint input without allowTabFill prop', () => {
 
         it('should not allow Tab button to autocomplete input with hint', () => {
             fireEvent.change(input, { target: { value: 'ap' } });
-            fireEvent.keyDown(input, { key: Tab });
+            fireEvent.keyDown(input, { key: TAB });
 
             expect(input.value).toBe('ap');
             expect(hint.value).toBe('ples');
@@ -259,7 +299,7 @@ describe('Hint input without allowTabFill prop', () => {
 
         it('should not autocomplete input with hint when caret is not at the end of text', () => {
             fireEvent.change(input, { target: { value: 'Pe', selectionEnd: 1 } });
-            fireEvent.keyDown(input, { key: ArrowRight });
+            fireEvent.keyDown(input, { key: ARROWRIGHT });
 
             expect(input.value).toBe('Pe');
         });
@@ -268,7 +308,7 @@ describe('Hint input without allowTabFill prop', () => {
             fireEvent.change(input, { target: { value: 'Pears' } });
             expect(hint.value).toBe('');
 
-            fireEvent.keyDown(input, { key: ArrowRight });
+            fireEvent.keyDown(input, { key: ARROWRIGHT });
             expect(hint.value).toBe('');
         });
     }
@@ -282,7 +322,7 @@ describe('Hint input without allowTabFill prop', () => {
         fireEvent.change(input1, { target: { value: 'Pe' } });
         expect(hint2.value).toBe('');
 
-        fireEvent.keyDown(input1, { key: ArrowRight });
+        fireEvent.keyDown(input1, { key: ARROWRIGHT });
         expect(input2.value).toBe('');
         expect(hint2.value).toBe('');
     }
@@ -315,6 +355,25 @@ describe('Hint input with allowTabFill prop set to true', () => {
         });
 
         runCommonTests();
+
+        it('should call onAutoComplete callback once input gets filled with hint', () => {
+            const handleOnAutoComplete = jest.fn();
+
+            const { container } = render(
+                <Hint options={objectOptions} allowTabFill onAutoComplete={handleOnAutoComplete}>
+                    <input onChange={handleChange} />
+                </Hint>
+            );
+            const inputs = container.getElementsByTagName('input');
+            const input = inputs[0];
+
+            fireEvent.change(input, { target: { value: 'Pe' } });
+            fireEvent.keyDown(input, { key: TAB });
+            expect(handleOnAutoComplete).toHaveBeenCalledWith({
+                id: '3',
+                text: 'Pea'
+            });
+        });
     });
 
     function getElements(container: HTMLElement): [HTMLInputElement, HTMLInputElement] {
@@ -328,7 +387,7 @@ describe('Hint input with allowTabFill prop set to true', () => {
     function runCommonTests() {
         it('should autoComplete the input correctly on press of tab button', async () => {
             fireEvent.change(input, { target: { value: 'ap' } });
-            fireEvent.keyDown(input, { key: Tab });
+            fireEvent.keyDown(input, { key: TAB });
 
             expect(input.value).toBe('apples');
             expect(hint.value).toBe('');
@@ -336,7 +395,7 @@ describe('Hint input with allowTabFill prop set to true', () => {
 
         it('should autoComplete the input correctly on press of right button', async () => {
             fireEvent.change(input, { target: { value: 'ap' } });
-            fireEvent.keyDown(input, { key: ArrowRight });
+            fireEvent.keyDown(input, { key: ARROWRIGHT });
 
             expect(input.value).toBe('apples');
             expect(hint.value).toBe('');
@@ -344,8 +403,8 @@ describe('Hint input with allowTabFill prop set to true', () => {
 
         it('should not autocomplete input with hint when caret is not at the end of the input text', () => {
             fireEvent.change(input, { target: { value: 'Pe', selectionEnd: 1 } });
-            fireEvent.keyDown(input, { key: Tab });
-            fireEvent.keyDown(input, { key: ArrowRight });
+            fireEvent.keyDown(input, { key: TAB });
+            fireEvent.keyDown(input, { key: ARROWRIGHT });
 
             expect(input.value).toBe('Pe');
         });

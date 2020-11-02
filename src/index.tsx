@@ -5,16 +5,13 @@ import React, {
     useRef,
     ReactElement
 } from 'react';
+import { IHintOption } from './IHintOption';
 import {
     mergeRefs,
     interpolateStyle,
-    sortAsc
+    sortAsc,
+    getFirstDuplicateOption
 } from './utils';
-
-export interface IHintOption {
-    id: string | number;
-    text: string;
-}
 
 export interface IHintProps {
     options: Array<string | IHintOption>;
@@ -43,6 +40,15 @@ export const Hint: React.FC<IHintProps> = props => {
     const [hint, setHint] = useState('');
     const [hintId, setHintId] = useState<string | number>('');
     const [changeEvent, setChangeEvent] = useState<React.ChangeEvent<HTMLInputElement>>();
+
+    useEffect(() => {
+        if(typeof options[0] === 'object'){
+            const duplicate = getFirstDuplicateOption(options as Array<IHintOption>);
+            if(duplicate){
+                console.warn(`react-autocomplete-hint: "${duplicate}" occurs more than once and may cause errors. Options should not contain duplicate values!`);
+            }
+        }
+    }, []);
 
     useEffect(() => {
         if (disableHint) {
@@ -102,9 +108,9 @@ export const Hint: React.FC<IHintProps> = props => {
 
             const selectedValue = typeof (options[0]) === 'string'
                 ? text + hint
-                : (options as Array<IHintOption>).filter(x => x.id === hintId)[0];
+                : (options as Array<IHintOption>).find(x => x.id === hintId);
 
-            onAutoComplete && onAutoComplete(selectedValue);
+            onAutoComplete && onAutoComplete(selectedValue!);
         }
     };
 
@@ -161,10 +167,8 @@ export const Hint: React.FC<IHintProps> = props => {
             // it's at the end of the input value. For non-selectable types ("email",
             // "number"), always select the hint.
 
-            const isNonSelectableType = e.currentTarget.selectionEnd == null;
-            const caretIsAtTextEnd = isNonSelectableType
-                ? true
-                : e.currentTarget.selectionEnd === e.currentTarget.value.length;
+            const isNonSelectableType = e.currentTarget.selectionEnd === null;
+            const caretIsAtTextEnd = isNonSelectableType || e.currentTarget.selectionEnd === e.currentTarget.value.length;
 
             return caretIsAtTextEnd;
         })();
@@ -246,7 +250,6 @@ export const Hint: React.FC<IHintProps> = props => {
                                     top: 0,
                                     left: 0,
                                 }}
-
                             >
                                 <span
                                     className='rah-text-filler'
@@ -273,8 +276,7 @@ export const Hint: React.FC<IHintProps> = props => {
                                         color: 'rgba(0, 0, 0, 0.35)',
                                         caretColor: 'transparent'
                                     }}
-                                    value={hint}
-                                    onChange={() => null}
+                                    defaultValue={hint}
                                     tabIndex={-1}
                                 />
                             </span>
