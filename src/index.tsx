@@ -5,13 +5,20 @@ import React, {
     useRef,
     ReactElement
 } from 'react';
-import { mergeRefs, interpolateStyle } from './utils';
+import { IHintOption } from './IHintOption';
+import {
+    mergeRefs,
+    interpolateStyle,
+    sortAsc,
+    getFirstDuplicateOption
+} from './utils';
 
 export interface IHintProps {
-    options: Array<string>;
+    options: Array<string> | Array<IHintOption>;
     disableHint?: boolean;
     children: ReactElement;
     allowTabFill?: boolean;
+    onFill?(value: string | IHintOption): void;
 }
 
 export const Hint: React.FC<IHintProps> = props => {
@@ -20,7 +27,8 @@ export const Hint: React.FC<IHintProps> = props => {
     const {
         options,
         disableHint,
-        allowTabFill
+        allowTabFill,
+        onFill
     } = props;
 
     const childProps = child.props;
@@ -30,7 +38,17 @@ export const Hint: React.FC<IHintProps> = props => {
     let hintRef = useRef<HTMLInputElement>(null);
     const [text, setText] = useState('');
     const [hint, setHint] = useState('');
+    const [match, setMatch] = useState<string | IHintOption>();
     const [changeEvent, setChangeEvent] = useState<React.ChangeEvent<HTMLInputElement>>();
+
+    useEffect(() => {
+        if(typeof options[0] === 'object'){
+            const duplicate = getFirstDuplicateOption(options as Array<IHintOption>);
+            if(duplicate){
+                console.warn(`react-autocomplete-hint: "${duplicate}" occurs more than once and may cause errors. Options should not contain duplicate values!`);
+            }
+        }
+    }, []);
 
     useEffect(() => {
         if (disableHint) {
@@ -41,27 +59,52 @@ export const Hint: React.FC<IHintProps> = props => {
         inputStyle && styleHint(hintWrapperRef, hintRef, inputStyle);
     });
 
-    const getHint = (text: string) => {
+    const getMatch = (text: string) => {
         if (!text || text === '') {
-            return '';
+            return;
         }
 
-        const match = options
-            .filter(x => x.toLowerCase() !== text.toLowerCase() && x.toLowerCase().startsWith(text.toLowerCase()))
-            .sort()[0];
+        if (typeof (options[0]) === 'string') {
+            const match = (options as Array<string>)
+                .filter(x => x.toLowerCase() !== text.toLowerCase() && x.toLowerCase().startsWith(text.toLowerCase()))
+                .sort()[0];
 
-        return match
-            ? match.slice(text.length)
-            : '';
+            return match;
+        } else {
+            const match = (options as Array<IHintOption>)
+                .filter(x => x.label.toLowerCase() !== text.toLowerCase() && x.label.toLowerCase().startsWith(text.toLowerCase()))
+                .sort((a, b) => sortAsc(a.label, b.label))[0];
+
+            return match;
+        }
     };
 
-    const setAvailableHint = () => {
-        if (hint !== '') {
-            if (changeEvent) {
-                changeEvent.target.value = text + hint;
-                childProps.onChange && childProps.onChange(changeEvent);
-                setHint('');
-            }
+    const setHintTextAndId = (text: string) => {
+        setText(text);
+
+        const match = getMatch(text);
+        let hint: string;
+
+        if (!match) {
+            hint = '';
+        }
+        else if (typeof match === 'string') {
+            hint = match.slice(text.length);
+        } else {
+            hint = match.label.slice(text.length);
+        }
+
+        setHint(hint);
+        setMatch(match);
+    }
+
+    const handleOnFill = () => {
+        if (hint !== '' && changeEvent) {
+            changeEvent.target.value = text + hint;
+            childProps.onChange && childProps.onChange(changeEvent);
+            setHintTextAndId('');
+
+            onFill && onFill(match!);
         }
     };
 
@@ -93,20 +136,19 @@ export const Hint: React.FC<IHintProps> = props => {
         setChangeEvent(e);
         e.persist();
 
-        setText(e.target.value);
-        setHint(getHint(e.target.value));
+        setHintTextAndId(e.target.value);
         childProps.onChange && childProps.onChange(e);
     };
 
     const onFocus = (e: React.FocusEvent<HTMLInputElement>) => {
-        setHint(getHint(e.target.value));
+        setHintTextAndId(e.target.value);
         childProps.onFocus && childProps.onFocus(e);
     };
 
     const onBlur = (e: React.FocusEvent<HTMLInputElement>) => {
         //Only blur it if the new focus isn't the the hint input
         if (hintRef?.current !== e.relatedTarget) {
-            setHint('');
+            setHintTextAndId('');
             childProps.onBlur && childProps.onBlur(e);
         }
     };
@@ -119,19 +161,17 @@ export const Hint: React.FC<IHintProps> = props => {
             // it's at the end of the input value. For non-selectable types ("email",
             // "number"), always select the hint.
 
-            const isNonSelectableType = e.currentTarget.selectionEnd == null;
-            const caretIsAtTextEnd = isNonSelectableType
-                ? true
-                : e.currentTarget.selectionEnd === e.currentTarget.value.length;
+            const isNonSelectableType = e.currentTarget.selectionEnd === null;
+            const caretIsAtTextEnd = isNonSelectableType || e.currentTarget.selectionEnd === e.currentTarget.value.length;
 
             return caretIsAtTextEnd;
         })();
 
         if (caretIsAtTextEnd && e.key === ARROWRIGHT) {
-            setAvailableHint();
+            handleOnFill();
         } else if (caretIsAtTextEnd && allowTabFill && e.key === TAB && hint !== '') {
             e.preventDefault();
-            setAvailableHint();
+            handleOnFill();
         }
 
         childProps.onKeyDown && childProps.onKeyDown(e);
@@ -148,7 +188,7 @@ export const Hint: React.FC<IHintProps> = props => {
         }
 
         if (!!hint && hint !== '') {
-            setAvailableHint();
+            handleOnFill();
             setTimeout(() => {
                 mainInputRef.current?.focus();
                 const caretPosition = text.length + hintCaretPosition;
@@ -170,7 +210,7 @@ export const Hint: React.FC<IHintProps> = props => {
             onBlur,
             onFocus,
             onKeyDown,
-            ref: childRef && typeof(childRef) !== 'string'
+            ref: childRef && typeof (childRef) !== 'string'
                 ? mergeRefs(childRef, mainInputRef)
                 : mainInputRef
         }
@@ -204,9 +244,9 @@ export const Hint: React.FC<IHintProps> = props => {
                                     top: 0,
                                     left: 0,
                                 }}
-
                             >
                                 <span
+                                    className='rah-text-filler'
                                     style={{
                                         visibility: 'hidden',
                                         pointerEvents: 'none'
@@ -230,8 +270,7 @@ export const Hint: React.FC<IHintProps> = props => {
                                         color: 'rgba(0, 0, 0, 0.35)',
                                         caretColor: 'transparent'
                                     }}
-                                    value={hint}
-                                    onChange={() => null}
+                                    defaultValue={hint}
                                     tabIndex={-1}
                                 />
                             </span>
