@@ -49,11 +49,11 @@ export function getFirstDuplicateOption(array: Array<IHintOption>) {
     let tracker: { [key: string]: boolean } = {};
 
     for (let i = 0; i < array.length; i++) {
-        if (tracker[array[i].text]) {
-            return array[i].text;
+        if (tracker[array[i].label]) {
+            return array[i].label;
         }
 
-        tracker[array[i].text] = true;
+        tracker[array[i].label] = true;
     }
 
     return null;

@@ -18,7 +18,7 @@ export interface IHintProps {
     disableHint?: boolean;
     children: ReactElement;
     allowTabFill?: boolean;
-    onAutoComplete?(value: string | IHintOption): void;
+    onFill?(value: string | IHintOption): void;
 }
 
 export const Hint: React.FC<IHintProps> = props => {
@@ -28,7 +28,7 @@ export const Hint: React.FC<IHintProps> = props => {
         options,
         disableHint,
         allowTabFill,
-        onAutoComplete
+        onFill
     } = props;
 
     const childProps = child.props;
@@ -38,7 +38,7 @@ export const Hint: React.FC<IHintProps> = props => {
     let hintRef = useRef<HTMLInputElement>(null);
     const [text, setText] = useState('');
     const [hint, setHint] = useState('');
-    const [hintId, setHintId] = useState<string | number>('');
+    const [match, setMatch] = useState<string | IHintOption>();
     const [changeEvent, setChangeEvent] = useState<React.ChangeEvent<HTMLInputElement>>();
 
     useEffect(() => {
@@ -61,7 +61,7 @@ export const Hint: React.FC<IHintProps> = props => {
 
     const getMatch = (text: string) => {
         if (!text || text === '') {
-            return null;
+            return;
         }
 
         if (typeof (options[0]) === 'string') {
@@ -84,7 +84,6 @@ export const Hint: React.FC<IHintProps> = props => {
 
         const match = getMatch(text);
         let hint: string;
-        let hintId: string | number = '';
 
         if (!match) {
             hint = '';
@@ -93,24 +92,19 @@ export const Hint: React.FC<IHintProps> = props => {
             hint = match.slice(text.length);
         } else {
             hint = match.label.slice(text.length);
-            hintId = match ? match.id : '';
         }
 
         setHint(hint);
-        setHintId(hintId);
+        setMatch(match);
     }
 
-    const handleAutoComplete = () => {
+    const handleOnFill = () => {
         if (hint !== '' && changeEvent) {
             changeEvent.target.value = text + hint;
             childProps.onChange && childProps.onChange(changeEvent);
             setHintTextAndId('');
 
-            const selectedValue = typeof (options[0]) === 'string'
-                ? text + hint
-                : (options as Array<IHintOption>).find(x => x.id === hintId);
-
-            onAutoComplete && onAutoComplete(selectedValue!);
+            onFill && onFill(match!);
         }
     };
 
@@ -174,10 +168,10 @@ export const Hint: React.FC<IHintProps> = props => {
         })();
 
         if (caretIsAtTextEnd && e.key === ARROWRIGHT) {
-            handleAutoComplete();
+            handleOnFill();
         } else if (caretIsAtTextEnd && allowTabFill && e.key === TAB && hint !== '') {
             e.preventDefault();
-            handleAutoComplete();
+            handleOnFill();
         }
 
         childProps.onKeyDown && childProps.onKeyDown(e);
@@ -194,7 +188,7 @@ export const Hint: React.FC<IHintProps> = props => {
         }
 
         if (!!hint && hint !== '') {
-            handleAutoComplete();
+            handleOnFill();
             setTimeout(() => {
                 mainInputRef.current?.focus();
                 const caretPosition = text.length + hintCaretPosition;

@@ -57,21 +57,30 @@ Click on the hint or use your keyboard **Right** key or **Tab** key(if `allowTab
 
 #### allowTabFill (optional): `Boolean`
 
-#### onAutoComplete (optional): `(value: string | object)=> void`
+#### onFill (optional): `(value: string | object)=> void`
 
 
 ## object option
+If you're using objects for your options. object schema is as follows:
 
 #### id: `string | number`;
 #### label: `string`;
 
 
+## onFill
+Returns the option selected immediately the input is filled with the suggested hint. 
+
+Note that it won't return the selected option with the casing the user typed, rather it returns the option with the casing specified in your options prop. For example, if the options are specified like this:...
+
+```jsx
+const options = ["orange", "banana", "apple"];
+```
+...and the input gets filled with *"ORange"*, onFill will still return *"orange"*.
+
 ## Duplicate data
 If you are using objects for your options, You may have unexpected results if your data options contain objects with duplicate labels. For this reason, it is highly recommended that you pass in objects with unique labels if possible.
 
-For example, if you pass in `optionsWithDuplicateLabels` as seen below and you then fill the input with the *orange* hint, the orange will be the first orange object found in the array as can be seen in the `onAutoComplete` prop:
-
-//TODO rename onAutoComplete and label
+For example, if you pass in `optionsWithDuplicateLabels` as seen below and you then fill the input with the *orange* hint, the orange will be the first orange object found in the array as can be seen in the `onFill` prop:
 
 ```jsx
 const optionsWithDuplicateLabels = [
@@ -80,7 +89,7 @@ const optionsWithDuplicateLabels = [
     {id: "3", label: "banana"}
 ];
 
-<Hint options={optionsWithDuplicateLabels} onAutoComplete={value=> {
+<Hint options={optionsWithDuplicateLabels} onFill={value=> {
     // will always log {id: "1", label: "orange"} when orange is selected
     // {id: "2", label: "orange"} will never be logged.
     console.log(value);
