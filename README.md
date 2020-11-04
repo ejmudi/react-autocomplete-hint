@@ -63,8 +63,8 @@ Click on the hint or use your keyboard **Right** key or **Tab** key(if `allowTab
 ## object option
 If you're using objects for your options. object schema is as follows:
 
-#### id: `string | number`;
-#### label: `string`;
+#### id: `string | number`
+#### label: `string`
 
 
 ## onFill
