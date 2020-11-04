@@ -14,7 +14,7 @@ import {
 } from './utils';
 
 export interface IHintProps {
-    options: Array<string | IHintOption>;
+    options: Array<string> | Array<IHintOption>;
     disableHint?: boolean;
     children: ReactElement;
     allowTabFill?: boolean;
@@ -72,8 +72,8 @@ export const Hint: React.FC<IHintProps> = props => {
             return match;
         } else {
             const match = (options as Array<IHintOption>)
-                .filter(x => x.text.toLowerCase() !== text.toLowerCase() && x.text.toLowerCase().startsWith(text.toLowerCase()))
-                .sort((a, b) => sortAsc(a.text, b.text))[0];
+                .filter(x => x.label.toLowerCase() !== text.toLowerCase() && x.label.toLowerCase().startsWith(text.toLowerCase()))
+                .sort((a, b) => sortAsc(a.label, b.label))[0];
 
             return match;
         }
@@ -92,7 +92,7 @@ export const Hint: React.FC<IHintProps> = props => {
         else if (typeof match === 'string') {
             hint = match.slice(text.length);
         } else {
-            hint = match.text.slice(text.length);
+            hint = match.label.slice(text.length);
             hintId = match ? match.id : '';
         }
 

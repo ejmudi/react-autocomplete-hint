@@ -10,31 +10,31 @@ const stringOptions = ['Persimmon', 'Pears', 'Pea', 'Papaya', 'Apples', 'Apricot
 const objectOptions = [
     {
         id: '1',
-        text: 'Persimmon'
+        label: 'Persimmon'
     },
     {
         id: '2',
-        text: 'Pears'
+        label: 'Pears'
     },
     {
         id: '3',
-        text: 'Pea'
+        label: 'Pea'
     },
     {
         id: '4',
-        text: 'Papaya'
+        label: 'Papaya'
     },
     {
         id: '5',
-        text: 'Apples'
+        label: 'Apples'
     },
     {
         id: '6',
-        text: 'Apricots'
+        label: 'Apricots'
     },
     {
         id: '7',
-        text: 'Avocados'
+        label: 'Avocados'
     }
 ];
 const handleChange = jest.fn();
@@ -133,19 +133,19 @@ describe('Hint input without allowTabFill prop', () => {
             const objectOptions = [
                 {
                     id: 1,
-                    text: 'pea'
+                    label: 'pea'
                 },
                 {
                     id: 2,
-                    text: 'papaya'
+                    label: 'papaya'
                 },
                 {
                     id: 3,
-                    text: 'pea'
+                    label: 'pea'
                 },
                 {
                     id: 4,
-                    text: 'pear'
+                    label: 'pear'
                 }
             ];
 
@@ -587,7 +587,7 @@ describe('Hint with ref set on input', () => {
         runCallbackRefsTest(objectOptions);
     });
 
-    function runNonCallbackRefsTest(options: Array<string | IHintOption>) {
+    function runNonCallbackRefsTest(options: Array<string> | Array<IHintOption>) {
         it('should preserve a non-callback ref set on the input', () => {
             const { result } = renderHook(() => useRef<HTMLInputElement>(null));
             const inputRef = result.current;
@@ -606,7 +606,7 @@ describe('Hint with ref set on input', () => {
         });
     }
 
-    function runCallbackRefsTest(options: Array<string | IHintOption>) {
+    function runCallbackRefsTest(options: Array<string> | Array<IHintOption>) {
         it('should preserve callback ref set on the input', () => {
             let inputRef: any;
 

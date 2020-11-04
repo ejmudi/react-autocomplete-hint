@@ -5,7 +5,15 @@ import './index.scss';
 
 const Demo: React.FC = () => {
     const [text, setText] = useState('');
-    const options = ['Papaya', 'Persimmon', 'Pear', 'Peach', 'Apples', 'Apricots', 'Avocados'];
+    const options = [ {
+        id: 2,
+        label: 'Persimmon'
+    },
+    {
+        id: '3',
+        label: 'Pea'
+    } 
+];
 
     return (
         <div className='demo'>
