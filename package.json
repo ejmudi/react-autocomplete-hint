@@ -7,7 +7,8 @@
   "files": [
     "dist/src/index.js",
     "dist/src/index.d.ts",
-    "dist/src/utils.js"
+    "dist/src/utils.js",
+    "dist/src/IHintOption.d.ts"
   ],
   "scripts": {
     "build": "webpack",
