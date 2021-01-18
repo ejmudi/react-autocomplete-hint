@@ -249,7 +249,8 @@ export const Hint: React.FC<IHintProps> = props => {
                                     className='rah-text-filler'
                                     style={{
                                         visibility: 'hidden',
-                                        pointerEvents: 'none'
+                                        pointerEvents: 'none',
+                                        whiteSpace: 'pre'
                                     }}
                                 >
                                     {text}

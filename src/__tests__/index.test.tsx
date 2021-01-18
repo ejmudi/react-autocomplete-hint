@@ -243,7 +243,7 @@ describe('Hint input without allowTabFill prop', () => {
         });
     });
 
-    function getElements(container: HTMLElement): [HTMLInputElement, HTMLInputElement, HTMLSpanElement] {
+    function getElements(container: Element): [HTMLInputElement, HTMLInputElement, HTMLSpanElement] {
         const inputs = container.getElementsByTagName('input');
         const input = inputs[0];
         const hint = inputs[1];
@@ -337,7 +337,7 @@ describe('Hint input without allowTabFill prop', () => {
         });
     }
 
-    function runMultipleInstancesTest(container: HTMLElement) {
+    function runMultipleInstancesTest(container: Element) {
         const inputs = container.getElementsByTagName('input');
         const input1 = inputs[0],
             input2 = inputs[2],
@@ -400,7 +400,7 @@ describe('Hint input with allowTabFill prop set to true', () => {
         });
     });
 
-    function getElements(container: HTMLElement): [HTMLInputElement, HTMLInputElement] {
+    function getElements(container: Element): [HTMLInputElement, HTMLInputElement] {
         const inputs = container.getElementsByTagName('input');
         const input = inputs[0];
         const hint = inputs[1];
@@ -473,7 +473,7 @@ describe('Hint input with allowTabFill prop set to true alongside another input'
         runCommonTests();
     });
 
-    function getElements(container: HTMLElement): [HTMLInputElement, HTMLInputElement] {
+    function getElements(container: Element): [HTMLInputElement, HTMLInputElement] {
         const inputs = container.getElementsByTagName('input');
         const input = inputs[0];
         const nextInput = inputs[2];
@@ -553,7 +553,7 @@ describe('Hint input with onClick hint fill feature', () => {
         runCommonTests();
     });
 
-    function getElements(container: HTMLElement): [HTMLInputElement, HTMLInputElement, HTMLSpanElement] {
+    function getElements(container: Element): [HTMLInputElement, HTMLInputElement, HTMLSpanElement] {
         const inputs = container.getElementsByTagName('input');
         const input = inputs[0];
         const hint = inputs[1];
@@ -648,7 +648,7 @@ describe('Hint with ref set on input', () => {
         });
     }
 
-    function runRefPreservationTest(container: HTMLElement) {
+    function runRefPreservationTest(container: Element) {
         const inputs = container.getElementsByTagName('input');
         const input = inputs[0];
         const hint = inputs[1];
