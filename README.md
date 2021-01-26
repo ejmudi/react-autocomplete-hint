@@ -81,9 +81,9 @@ const options = ["orange", "banana", "apple"];
 
 
 ## valueModifier
-This prop accepts a function that modifies your input value before saving it in state. 
+This prop accepts a function that modifies your input value before it is saved in state.
 
-It is typically useful when you are not setting `e.target.value` directly in state and need to modify it to 
+It is typically useful when you are not setting `e.target.value` directly in state and need to modify the target value to 
 some other value first before setting it in state.
 
 Example: A case where you need to set the input value to uppercase irrespective of the casing the user types in:
