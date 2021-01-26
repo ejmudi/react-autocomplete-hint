@@ -59,6 +59,8 @@ Click on the hint or use your keyboard **Right** key or **Tab** key(if `allowTab
 
 #### onFill (optional): `(value: string | object)=> void`
 
+#### valueModifier (optional): `(value: string)=> string`
+
 
 ## object option
 If you're using objects for your options. object schema is as follows:
@@ -76,6 +78,29 @@ Note that it won't return the selected option with the casing the user typed, ra
 const options = ["orange", "banana", "apple"];
 ```
 ...and the input gets filled with *"ORange"*, onFill will still return *"orange"*.
+
+
+## valueModifier
+This prop accepts a function that modifies your input value before it is saved in state.
+
+It is typically useful when you are not setting `e.target.value` directly in state and need to modify the target value to 
+some other value first before setting it in state.
+
+Example: A case where you need to set the input value to uppercase irrespective of the casing the user types in:
+
+```jsx
+const options = ["orange", "banana", "apple"];
+
+const modifyValue = (value: string) => value.toUpperCase();
+
+<Hint options={options} valueModifier={modifyValue}>
+    <input
+        value={text}
+        onChange={e => setText(modifyValue(e.target.value))} />
+</Hint>
+```
+Note: Not setting the `valueModifier` prop in cases like this might result to a malformed hint.
+
 
 ## Duplicate data
 If you are using objects for your options, You may have unexpected results if your data options contain objects with duplicate labels. For this reason, it is highly recommended that you pass in objects with unique labels if possible.
