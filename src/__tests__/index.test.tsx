@@ -37,7 +37,6 @@ const objectOptions = [
         label: 'Avocados'
     }
 ];
-const handleChange = jest.fn();
 const ARROWRIGHT = 'ArrowRight';
 const TAB = 'Tab';
 let input: HTMLInputElement;
@@ -49,7 +48,7 @@ describe('Hint input without allowTabFill prop', () => {
         beforeEach(() => {
             const { container } = render(
                 <Hint options={stringOptions}>
-                    <input onChange={handleChange} />
+                    <input />
                 </Hint>
             );
 
@@ -61,7 +60,7 @@ describe('Hint input without allowTabFill prop', () => {
         it('should not have autocomplete functionality when disableHint is set to true', () => {
             const { container } = render(
                 <Hint options={stringOptions} disableHint={true}>
-                    <input onChange={handleChange} />
+                    <input />
                 </Hint>
             );
 
@@ -74,12 +73,10 @@ describe('Hint input without allowTabFill prop', () => {
 
             const { container } = render(
                 <Hint options={stringOptions} onFill={handleOnFill}>
-                    <input onChange={handleChange} />
+                    <input />
                 </Hint>
             );
-            const inputs = container.getElementsByTagName('input');
-            const input = inputs[0];
-            const hint = inputs[1];
+            const [input, hint] = getElements(container);
 
             fireEvent.change(input, { target: { value: 'Pe' } });
             fireEvent.keyDown(input, { key: ARROWRIGHT });
@@ -102,10 +99,10 @@ describe('Hint input without allowTabFill prop', () => {
             const { container } = render(
                 <>
                     <Hint options={stringOptions.slice()}>
-                        <input onChange={handleChange} />
+                        <input />
                     </Hint>
                     <Hint options={stringOptions.slice()}>
-                        <input onChange={handleChange} />
+                        <input />
                     </Hint>
                 </>
             );
@@ -118,13 +115,11 @@ describe('Hint input without allowTabFill prop', () => {
         beforeEach(() => {
             const { container } = render(
                 <Hint options={objectOptions}>
-                    <input onChange={handleChange} />
+                    <input />
                 </Hint>
             );
 
-            input = container.getElementsByTagName('input')[0];
-            hint = container.getElementsByTagName('input')[1];
-            textFiller = container.getElementsByClassName('rah-text-filler')[0] as HTMLSpanElement;
+            [input, hint, textFiller] = getElements(container);
         });
 
         runCommonTests();
@@ -153,11 +148,11 @@ describe('Hint input without allowTabFill prop', () => {
 
             const { container } = render(
                 <Hint options={objectOptions}>
-                    <input onChange={handleChange} />
+                    <input />
                 </Hint>
             );
 
-            input = container.getElementsByTagName('input')[0];
+            [input] = getElements(container);
 
             const warningMessage = `react-autocomplete-hint: "pea" occurs more than once and may cause errors. Options should not contain duplicate values!`;
             expect(console.warn).toHaveBeenCalledWith(warningMessage);
@@ -173,12 +168,10 @@ describe('Hint input without allowTabFill prop', () => {
 
             const { container } = render(
                 <Hint options={objectOptions} onFill={handleOnFill}>
-                    <input onChange={handleChange} />
+                    <input />
                 </Hint>
             );
-            const inputs = container.getElementsByTagName('input');
-            const input = inputs[0];
-            const hint = inputs[1];
+            const [input, hint] = getElements(container);
 
             fireEvent.change(input, { target: { value: 'Pe' } });
             fireEvent.keyDown(input, { key: ARROWRIGHT });
@@ -207,17 +200,17 @@ describe('Hint input without allowTabFill prop', () => {
             const handleOnFill = jest.fn();
 
             const objectOptions = [
-                {id: 1, label: 'Persimmon'},
-                {id: 1, label: 'Pea'},
-                {id: 2, label: 'Pear'},
+                { id: 1, label: 'Persimmon' },
+                { id: 1, label: 'Pea' },
+                { id: 2, label: 'Pear' },
             ];
 
             const { container } = render(
                 <Hint options={objectOptions} onFill={handleOnFill}>
-                    <input onChange={handleChange} />
+                    <input />
                 </Hint>
             );
-            const input = container.getElementsByTagName('input')[0];
+            const [input] = getElements(container);
 
             fireEvent.change(input, { target: { value: 'Pe' } });
             fireEvent.keyDown(input, { key: ARROWRIGHT });
@@ -231,10 +224,10 @@ describe('Hint input without allowTabFill prop', () => {
             const { container } = render(
                 <>
                     <Hint options={objectOptions.slice()}>
-                        <input onChange={handleChange} />
+                        <input />
                     </Hint>
                     <Hint options={objectOptions.slice()}>
-                        <input onChange={handleChange} />
+                        <input />
                     </Hint>
                 </>
             );
@@ -357,7 +350,7 @@ describe('Hint input with allowTabFill prop set to true', () => {
         beforeEach(() => {
             const { container } = render(
                 <Hint options={stringOptions} allowTabFill>
-                    <input onChange={e => handleChange(e.target.value)} />
+                    <input />
                 </Hint>
             );
 
@@ -371,7 +364,7 @@ describe('Hint input with allowTabFill prop set to true', () => {
         beforeEach(() => {
             const { container } = render(
                 <Hint options={objectOptions} allowTabFill>
-                    <input onChange={e => handleChange(e.target.value)} />
+                    <input />
                 </Hint>
             );
 
@@ -385,11 +378,10 @@ describe('Hint input with allowTabFill prop set to true', () => {
 
             const { container } = render(
                 <Hint options={objectOptions} allowTabFill onFill={handleOnFill}>
-                    <input onChange={handleChange} />
+                    <input />
                 </Hint>
             );
-            const inputs = container.getElementsByTagName('input');
-            const input = inputs[0];
+            const [input] = getElements(container);
 
             fireEvent.change(input, { target: { value: 'Pe' } });
             fireEvent.keyDown(input, { key: TAB });
@@ -444,9 +436,9 @@ describe('Hint input with allowTabFill prop set to true alongside another input'
             const { container } = render(
                 <>
                     <Hint options={stringOptions} allowTabFill>
-                        <input onChange={handleChange} />
+                        <input />
                     </Hint>
-                    <input id='next-input' onChange={handleChange} />
+                    <input id='next-input' />
                 </>
             );
 
@@ -461,9 +453,9 @@ describe('Hint input with allowTabFill prop set to true alongside another input'
             const { container } = render(
                 <>
                     <Hint options={objectOptions} allowTabFill>
-                        <input onChange={handleChange} />
+                        <input />
                     </Hint>
-                    <input id='next-input' onChange={handleChange} />
+                    <input id='next-input' />
                 </>
             );
 
@@ -529,7 +521,7 @@ describe('Hint input with onClick hint fill feature', () => {
         beforeEach(() => {
             const { container } = render(
                 <Hint options={stringOptions}>
-                    <input onChange={handleChange} />
+                    <input />
                 </Hint>
             );
 
@@ -543,7 +535,7 @@ describe('Hint input with onClick hint fill feature', () => {
         beforeEach(() => {
             const { container } = render(
                 <Hint options={objectOptions}>
-                    <input onChange={handleChange} />
+                    <input />
                 </Hint>
             );
 
@@ -618,7 +610,7 @@ describe('Hint with ref set on input', () => {
 
             const { container } = render(
                 <Hint options={options}>
-                    <input onChange={handleChange} ref={inputRef} />
+                    <input ref={inputRef} />
                 </Hint>
             );
 
@@ -636,7 +628,7 @@ describe('Hint with ref set on input', () => {
 
             const { container } = render(
                 <Hint options={options}>
-                    <input onChange={handleChange} ref={element => {
+                    <input ref={element => {
                         inputRef = element;
                     }} />
                 </Hint>
@@ -658,5 +650,71 @@ describe('Hint with ref set on input', () => {
 
         expect(hintWrapper.style.lineHeight).toBe('1.5px');
         expect(hint.style.lineHeight).toBe('1.5px');
+    }
+});
+
+describe('Hint input with valueModifier prop set', () => {
+    const modifyValue = (value: string) => {
+        if (value[0] && value[0] === value[0].toLowerCase()) {
+            return value.toUpperCase();
+        }
+        return value.toLowerCase();
+    };
+
+    const onChangeHandler = jest.fn((e) => {
+        e.target.value = modifyValue(e.target.value);
+    });
+
+    describe('With string options', () => {
+        beforeEach(() => {
+            const { container } = render(
+                <Hint options={stringOptions} valueModifier={modifyValue}>
+                    <input onChange={onChangeHandler} />
+                </Hint>
+            );
+
+            [input, hint, textFiller] = getElements(container);
+        });
+
+        runCommonTests();
+    });
+
+    describe('With object options', () => {
+        beforeEach(() => {
+            const { container } = render(
+                <Hint options={objectOptions} valueModifier={modifyValue}>
+                    <input onChange={onChangeHandler} />
+                </Hint>
+            );
+
+            [input, hint, textFiller] = getElements(container);
+        });
+
+        runCommonTests();
+    });
+
+    function getElements(container: Element): [HTMLInputElement, HTMLInputElement, HTMLSpanElement] {
+        const inputs = container.getElementsByTagName('input');
+        const input = inputs[0];
+        const hint = inputs[1];
+        const textFiller = container.getElementsByClassName('rah-text-filler')[0] as HTMLSpanElement;
+
+        return [input, hint, textFiller];
+    }
+
+    function runCommonTests() {
+        it('should fill up the text filler behind correctly while typing', () => {
+            fireEvent.change(input, { target: { value: 'per' } });
+            expect(textFiller.innerHTML).toBe('PER');
+
+            fireEvent.change(input, { target: { value: 'Per' } });
+            expect(textFiller.innerHTML).toBe('per');
+        });
+
+        it('should fill the input correctly on press of right button', () => {
+            fireEvent.change(input, { target: { value: 'peR' } });
+            fireEvent.keyDown(input, { key: ARROWRIGHT });
+            expect(input.value).toBe('PERSIMMON');
+        });
     }
 });

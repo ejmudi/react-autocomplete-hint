@@ -19,6 +19,7 @@ export interface IHintProps {
     children: ReactElement;
     allowTabFill?: boolean;
     onFill?(value: string | IHintOption): void;
+    valueModifier?(value: string): string;
 }
 
 export const Hint: React.FC<IHintProps> = props => {
@@ -28,7 +29,8 @@ export const Hint: React.FC<IHintProps> = props => {
         options,
         disableHint,
         allowTabFill,
-        onFill
+        onFill,
+        valueModifier
     } = props;
 
     const childProps = child.props;
@@ -36,6 +38,7 @@ export const Hint: React.FC<IHintProps> = props => {
     let mainInputRef = useRef<HTMLInputElement>(null);
     let hintWrapperRef = useRef<HTMLSpanElement>(null);
     let hintRef = useRef<HTMLInputElement>(null);
+    const [unModifiedText, setUnmodifiedText] = useState('');
     const [text, setText] = useState('');
     const [hint, setHint] = useState('');
     const [match, setMatch] = useState<string | IHintOption>();
@@ -100,7 +103,7 @@ export const Hint: React.FC<IHintProps> = props => {
 
     const handleOnFill = () => {
         if (hint !== '' && changeEvent) {
-            changeEvent.target.value = text + hint;
+            changeEvent.target.value = unModifiedText + hint;
             childProps.onChange && childProps.onChange(changeEvent);
             setHintTextAndId('');
 
@@ -136,7 +139,10 @@ export const Hint: React.FC<IHintProps> = props => {
         setChangeEvent(e);
         e.persist();
 
-        setHintTextAndId(e.target.value);
+        setUnmodifiedText(e.target.value);
+        const modifiedValue = valueModifier ? valueModifier(e.target.value) : e.target.value;
+        setHintTextAndId(modifiedValue);
+        
         childProps.onChange && childProps.onChange(e);
     };
 
