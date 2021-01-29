@@ -57,6 +57,16 @@ describe('Hint input without allowTabFill prop', () => {
 
         runCommonTests();
 
+        it(`should throw an error if Hint child is not of type 'input'`, () => {
+            expect(() => {
+                render(
+                    <Hint options={stringOptions}>
+                        <div />
+                    </Hint>
+                )
+            }).toThrowError(`react-autocomplete-hint: 'Hint' only accepts an 'input' element as child.`);
+        });
+
         it('should not have autocomplete functionality when disableHint is set to true', () => {
             const { container } = render(
                 <Hint options={stringOptions} disableHint={true}>

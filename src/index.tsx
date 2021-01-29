@@ -25,6 +25,10 @@ export interface IHintProps {
 export const Hint: React.FC<IHintProps> = props => {
     const child = React.Children.only(props.children);
 
+    if (child.type?.toString()?.toLowerCase() !== 'input') {
+        throw new TypeError(`react-autocomplete-hint: 'Hint' only accepts an 'input' element as child.`);
+    }
+
     const {
         options,
         disableHint,
@@ -45,9 +49,9 @@ export const Hint: React.FC<IHintProps> = props => {
     const [changeEvent, setChangeEvent] = useState<React.ChangeEvent<HTMLInputElement>>();
 
     useEffect(() => {
-        if(typeof options[0] === 'object'){
+        if (typeof options[0] === 'object') {
             const duplicate = getFirstDuplicateOption(options as Array<IHintOption>);
-            if(duplicate){
+            if (duplicate) {
                 console.warn(`react-autocomplete-hint: "${duplicate}" occurs more than once and may cause errors. Options should not contain duplicate values!`);
             }
         }
@@ -142,7 +146,7 @@ export const Hint: React.FC<IHintProps> = props => {
         setUnmodifiedText(e.target.value);
         const modifiedValue = valueModifier ? valueModifier(e.target.value) : e.target.value;
         setHintTextAndId(modifiedValue);
-        
+
         childProps.onChange && childProps.onChange(e);
     };
 
