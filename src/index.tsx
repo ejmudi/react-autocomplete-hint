@@ -39,6 +39,7 @@ export const Hint: React.FC<IHintProps> = props => {
 
     const childProps = child.props;
 
+    let inputWrapperRef = useRef<HTMLDivElement>(null);
     let mainInputRef = useRef<HTMLInputElement>(null);
     let hintWrapperRef = useRef<HTMLSpanElement>(null);
     let hintRef = useRef<HTMLInputElement>(null);
@@ -63,7 +64,7 @@ export const Hint: React.FC<IHintProps> = props => {
         }
 
         const inputStyle = mainInputRef.current && window.getComputedStyle(mainInputRef.current);
-        inputStyle && styleHint(hintWrapperRef, hintRef, inputStyle);
+        inputStyle && styleHint(inputWrapperRef, hintWrapperRef, hintRef, inputStyle);
     });
 
     const getMatch = (text: string) => {
@@ -116,9 +117,14 @@ export const Hint: React.FC<IHintProps> = props => {
     };
 
     const styleHint = (
+        inputWrapperRef: React.RefObject<HTMLDivElement>,
         hintWrapperRef: React.RefObject<HTMLSpanElement>,
         hintRef: React.RefObject<HTMLInputElement>,
         inputStyle: CSSStyleDeclaration) => {
+        if (inputWrapperRef?.current?.style) {
+            inputWrapperRef.current.style.width = inputStyle.width;
+        }
+        
         if (hintWrapperRef?.current?.style) {
             hintWrapperRef.current.style.fontFamily = inputStyle.fontFamily;
             hintWrapperRef.current.style.fontSize = inputStyle.fontSize;
@@ -230,8 +236,7 @@ export const Hint: React.FC<IHintProps> = props => {
         <div
             className="rah-input-wrapper"
             style={{
-                position: 'relative',
-                display: 'inline-block'
+                position: 'relative'
             }}>
             {
                 disableHint
@@ -278,7 +283,7 @@ export const Hint: React.FC<IHintProps> = props => {
                                         boxShadow: 'none',
                                         padding: 0,
                                         margin: 0,
-                                        color: 'rgba(0, 0, 0, 0.35)',
+                                        color: 'rgba(0, 0, 0, 0.30)',
                                         caretColor: 'transparent'
                                     }}
                                     defaultValue={hint}
