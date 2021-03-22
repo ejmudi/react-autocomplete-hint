@@ -19,6 +19,7 @@ export interface IHintProps {
     children: ReactElement;
     allowTabFill?: boolean;
     onFill?(value: string | IHintOption): void;
+    onHint?(value: string | IHintOption | undefined): void;
     valueModifier?(value: string): string;
 }
 
@@ -34,6 +35,7 @@ export const Hint: React.FC<IHintProps> = props => {
         disableHint,
         allowTabFill,
         onFill,
+        onHint,
         valueModifier
     } = props;
 
@@ -104,6 +106,7 @@ export const Hint: React.FC<IHintProps> = props => {
 
         setHint(hint);
         setMatch(match);
+        onHint && onHint(match)
     }
 
     const handleOnFill = () => {
