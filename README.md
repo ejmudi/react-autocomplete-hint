@@ -59,6 +59,8 @@ Click on the hint or use your keyboard **Right** key or **Tab** key(if `allowTab
 
 #### onFill (optional): `(value: string | object)=> void`
 
+#### onHint (optional): `(value: string | object | undefined): void`
+
 #### valueModifier (optional): `(value: string)=> string`
 
 
@@ -78,6 +80,10 @@ Note that it won't return the selected option with the casing the user typed, ra
 const options = ["orange", "banana", "apple"];
 ```
 ...and the input gets filled with *"ORange"*, onFill will still return *"orange"*.
+
+
+## onHint
+Returns the current hint.
 
 
 ## valueModifier
