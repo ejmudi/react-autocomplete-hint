@@ -46,7 +46,7 @@ const options = [
 
 ```
 
-Click on the hint or use your keyboard **Right** key or **Tab** key(if `allowTabFill` is set to true) to fill your input with the suggested hint.
+Click on the hint or use your keyboard **Right** key, **Tab** key (if `allowTabFill` is set to true), or **Enter** key (if `allowEnterFill` is set to true) to fill your input with the suggested hint.
 
 
 ## Props
@@ -56,6 +56,8 @@ Click on the hint or use your keyboard **Right** key or **Tab** key(if `allowTab
 #### disableHint (optional): `Boolean`
 
 #### allowTabFill (optional): `Boolean`
+
+#### allowEnterFill (optional): `Boolean`
 
 #### onFill (optional): `(value: string | object)=> void`
 
