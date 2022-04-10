@@ -46,7 +46,7 @@ export const Hint: React.FC<IHintProps> = props => {
     let mainInputRef = useRef<HTMLInputElement>(null);
     let hintWrapperRef = useRef<HTMLSpanElement>(null);
     let hintRef = useRef<HTMLInputElement>(null);
-    const [unModifiedText, setUnmodifiedText] = useState('');
+    const [unModifiedInputText, setUnmodifiedInputText] = useState('');
     const [text, setText] = useState('');
     const [hint, setHint] = useState('');
     const [match, setMatch] = useState<string | IHintOption>();
@@ -111,19 +111,25 @@ export const Hint: React.FC<IHintProps> = props => {
     }
 
     const handleOnFill = () => {
-        if (hint !== '' && changeEvent) {
-            changeEvent.target.value = unModifiedText + hint;
-            childProps.onChange && childProps.onChange(changeEvent);
-            setHintTextAndId('');
-
-            onFill && onFill(match!);
+        if (hint === '' || !changeEvent) {
+            return;
         }
+        
+        const newUnModifiedText = unModifiedInputText + hint;
+
+        changeEvent.target.value = newUnModifiedText;
+        childProps.onChange && childProps.onChange(changeEvent);
+        setHintTextAndId('');
+
+        onFill && onFill(match!);
+
+        setUnmodifiedInputText(newUnModifiedText);
     };
 
     const styleHint = (
         hintWrapperRef: React.RefObject<HTMLSpanElement>,
         hintRef: React.RefObject<HTMLInputElement>,
-        inputStyle: CSSStyleDeclaration) => {        
+        inputStyle: CSSStyleDeclaration) => {
         if (hintWrapperRef?.current?.style) {
             hintWrapperRef.current.style.fontFamily = inputStyle.fontFamily;
             hintWrapperRef.current.style.fontSize = inputStyle.fontSize;
@@ -148,7 +154,7 @@ export const Hint: React.FC<IHintProps> = props => {
         setChangeEvent(e);
         e.persist();
 
-        setUnmodifiedText(e.target.value);
+        setUnmodifiedInputText(e.target.value);
         const modifiedValue = valueModifier ? valueModifier(e.target.value) : e.target.value;
         setHintTextAndId(modifiedValue);
 

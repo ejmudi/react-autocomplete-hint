@@ -126,6 +126,11 @@ describe('Hint input without allowTabFill and allowEnterFill props', () => {
 
             runMultipleInstancesTest(container);
         });
+
+        it(`should fill input with correct text (with Preserved Casing) for contiguous hint click`, () => {
+            const options = ['banana', 'banana!123'];
+            runContiguousHintClickTest(options);
+        });
     });
 
     describe('With object options', () => {
@@ -251,6 +256,20 @@ describe('Hint input without allowTabFill and allowEnterFill props', () => {
 
             runMultipleInstancesTest(container);
         });
+
+        it(`should fill input with correct text (with Preserved Casing) for contiguous hint click`, () => {
+            const options = [
+                {
+                    id: '1',
+                    label: 'banana'
+                },
+                {
+                    id: '2',
+                    label: 'banana!123'
+                }
+            ];
+            runContiguousHintClickTest(options);
+        });
     });
 
     function getElements(container: Element): [HTMLInputElement, HTMLInputElement, HTMLSpanElement] {
@@ -359,6 +378,25 @@ describe('Hint input without allowTabFill and allowEnterFill props', () => {
         fireEvent.keyDown(input1, { key: ARROWRIGHT });
         expect(input2.value).toBe('');
         expect(hint2.value).toBe('');
+    }
+
+    function runContiguousHintClickTest(options: Array<string> | Array<IHintOption>) {
+        const { container } = render(
+            <Hint options={options}>
+                <input />
+            </Hint>
+        );
+        [input, hint, textFiller] = getElements(container);
+
+        fireEvent.change(input, { target: { value: 'bA' } });
+        fireEvent.click(hint, { target: { selectionEnd: 1 } });
+
+        expect(input.value).toBe('bAnana');
+        fireEvent.click(hint, { target: { selectionEnd: 1 } });
+        expect(hint.value).toBe('!123');
+
+        fireEvent.click(hint, { target: { selectionEnd: 1 } });
+        expect(input.value).toBe('bAnana!123');
     }
 });
 
@@ -655,14 +693,14 @@ describe('Hint input with onClick hint fill feature', () => {
     }
 
     function runCommonTests() {
-        it('should not fill the input when the user clicks the hint at position 0', () => {
+        it('should not fill the input when the user clicks the hint at hint char position 0', () => {
             fireEvent.change(input, { target: { value: 'Pers' } });
             fireEvent.click(hint, { target: { selectionEnd: 0 } });
             expect(input.value).toBe('Pers');
             expect(input.selectionEnd).toBe(4);
         });
 
-        it('should fill the input when the user clicks the hint at a position other than 0', () => {
+        it('should fill the input when the user clicks the hint at a hint char position other than 0', () => {
             fireEvent.change(input, { target: { value: 'Pers' } });
             fireEvent.click(hint, { target: { selectionEnd: 1 } });
 
