@@ -39,11 +39,12 @@ const objectOptions = [
 ];
 const ARROWRIGHT = 'ArrowRight';
 const TAB = 'Tab';
+const ENTER = 'Enter';
 let input: HTMLInputElement;
 let hint: HTMLInputElement;
 let textFiller: HTMLSpanElement;
 
-describe('Hint input without allowTabFill prop', () => {
+describe('Hint input without allowTabFill and allowEnterFill props', () => {
     describe('With string options', () => {
         beforeEach(() => {
             const { container } = render(
@@ -352,6 +353,89 @@ describe('Hint input without allowTabFill prop', () => {
         fireEvent.keyDown(input1, { key: ARROWRIGHT });
         expect(input2.value).toBe('');
         expect(hint2.value).toBe('');
+    }
+});
+
+describe('Hint input with allowEnterFill prop set to true', () => {
+    describe('With string options', () => {
+        beforeEach(() => {
+            const { container } = render(
+                <Hint options={stringOptions} allowEnterFill>
+                    <input />
+                </Hint>
+            );
+
+            [input, hint] = getElements(container);
+        });
+
+        runCommonTests();
+    });
+
+    describe('With object options', () => {
+        beforeEach(() => {
+            const { container } = render(
+                <Hint options={objectOptions} allowEnterFill>
+                    <input />
+                </Hint>
+            );
+
+            [input, hint] = getElements(container);
+        });
+
+        runCommonTests();
+
+        it('should call onFill callback once input gets filled with hint', () => {
+            const handleOnFill = jest.fn();
+
+            const { container } = render(
+                <Hint options={objectOptions} allowEnterFill onFill={handleOnFill}>
+                    <input />
+                </Hint>
+            );
+            const [input] = getElements(container);
+
+            fireEvent.change(input, { target: { value: 'Pe' } });
+            fireEvent.keyDown(input, { key: ENTER });
+            expect(handleOnFill).toHaveBeenCalledWith({
+                id: '3',
+                label: 'Pea'
+            });
+        });
+    });
+
+    function getElements(container: Element): [HTMLInputElement, HTMLInputElement] {
+        const inputs = container.getElementsByTagName('input');
+        const input = inputs[0];
+        const hint = inputs[1];
+
+        return [input, hint];
+    }
+
+    function runCommonTests() {
+        it('should fill the input correctly on press of Enter button', async () => {
+            fireEvent.change(input, { target: { value: 'ap' } });
+            fireEvent.keyDown(input, { key: ENTER });
+
+            expect(input.value).toBe('apples');
+            expect(hint.value).toBe('');
+        });
+
+        it('should not mess up the default behaviour, should fill the input correctly on press of right button', async () => {
+            fireEvent.change(input, { target: { value: 'ap' } });
+            fireEvent.keyDown(input, { key: ARROWRIGHT });
+
+            expect(input.value).toBe('apples');
+            expect(hint.value).toBe('');
+        });
+
+        it('should not fill input with hint when caret is not at the end of the input text', () => {
+            fireEvent.change(input, { target: { value: 'Pe', selectionEnd: 1 } });
+            fireEvent.keyDown(input, { key: ENTER });
+            fireEvent.keyDown(input, { key: ARROWRIGHT });
+
+            expect(input.value).toBe('Pe');
+        });
+
     }
 });
 

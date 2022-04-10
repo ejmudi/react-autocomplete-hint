@@ -18,6 +18,7 @@ export interface IHintProps {
     disableHint?: boolean;
     children: ReactElement;
     allowTabFill?: boolean;
+    allowEnterFill?: boolean;
     onFill?(value: string | IHintOption): void;
     onHint?(value: string | IHintOption | undefined): void;
     valueModifier?(value: string): string;
@@ -34,6 +35,7 @@ export const Hint: React.FC<IHintProps> = props => {
         options,
         disableHint,
         allowTabFill,
+        allowEnterFill,
         onFill,
         onHint,
         valueModifier
@@ -57,7 +59,7 @@ export const Hint: React.FC<IHintProps> = props => {
                 console.warn(`react-autocomplete-hint: "${duplicate}" occurs more than once and may cause errors. Options should not contain duplicate values!`);
             }
         }
-    }, []);
+    }, [options]);
 
     useEffect(() => {
         if (disableHint) {
@@ -168,6 +170,7 @@ export const Hint: React.FC<IHintProps> = props => {
 
     const ARROWRIGHT = 'ArrowRight';
     const TAB = 'Tab';
+    const ENTER = 'Enter';
     const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         const caretIsAtTextEnd = (() => {
             // For selectable input types ("text", "search"), only select the hint if
@@ -183,6 +186,9 @@ export const Hint: React.FC<IHintProps> = props => {
         if (caretIsAtTextEnd && e.key === ARROWRIGHT) {
             handleOnFill();
         } else if (caretIsAtTextEnd && allowTabFill && e.key === TAB && hint !== '') {
+            e.preventDefault();
+            handleOnFill();
+        } else if (caretIsAtTextEnd && allowEnterFill && e.key === ENTER && hint !== '') {
             e.preventDefault();
             handleOnFill();
         }
