@@ -8,7 +8,11 @@ module.exports = {
         ]
     },
     devServer: {
-        contentBase: './docs',
+        static: {
+            directory: path.join(__dirname, 'docs'),
+        },
+        compress: true,
+        port: 8080,
         hot: true
     },
     output: {
