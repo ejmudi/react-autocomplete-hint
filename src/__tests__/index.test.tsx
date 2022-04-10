@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import React, { useRef } from 'react';
 import { render, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -59,6 +63,8 @@ describe('Hint input without allowTabFill and allowEnterFill props', () => {
         runCommonTests();
 
         it(`should throw an error if Hint child is not of type 'input'`, () => {
+            jest.spyOn(console, 'error').mockImplementation(() => {});
+
             expect(() => {
                 render(
                     <Hint options={stringOptions}>
