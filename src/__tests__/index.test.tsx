@@ -127,7 +127,7 @@ describe('Hint input without allowTabFill and allowEnterFill props', () => {
             runMultipleInstancesTest(container);
         });
 
-        it(`should fill input with correct text (with Preserved Casing) for contiguous hint click`, () => {
+        it(`should fill input with correct text (with preserved casing) for contiguous hint click`, () => {
             const options = ['banana', 'banana!123'];
             runContiguousHintClickTest(options);
         });
