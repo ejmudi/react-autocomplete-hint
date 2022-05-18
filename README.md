@@ -61,7 +61,7 @@ Click on the hint or use your keyboard **Right** key, **Tab** key (if `allowTabF
 
 #### onFill (optional): `(value: string | object)=> void`
 
-#### onHint (optional): `(value: string | object | undefined): void`
+#### onHint (optional): `(value: string | object | undefined)=> void`
 
 #### valueModifier (optional): `(value: string)=> string`
 
